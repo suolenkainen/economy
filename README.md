@@ -1,4 +1,4 @@
-# economy
+# Economy simulator
 ## Story
 I wanted to create a simulation that simulates how economy works. I thought that the easiest way would be to enable trading between two places: one produces grain and the other is a village with bakery. Then there are workers who travel between these places providing bread for the farmers and grain to the bakery. The proce would vary based on the demand of the village, the wealth of village, etc.
 
@@ -19,5 +19,6 @@ A _producer_ is a place that creates goods from either producing gathering, hunt
 Currently I'm trying to create a MVP for a farm to deliver grain to a town.
 
 ## Future plans
+- Some randomness might be introduced to production rates, etc.
 - A _path_ file will be crated between two settlemens which can the be used by workers. The condition can increase or decrease based on use.
 - When there are crossing between delivery paths, a new town may form.
