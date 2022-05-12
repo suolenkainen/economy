@@ -1,4 +1,8 @@
 import pygame
+import towns, resources, workers
+
+# town = towns.create_town()
+# print(town_list.__dict__)
 
 def main():
 

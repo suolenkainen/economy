@@ -10,10 +10,15 @@ import os
 
 """ 
 Required attributes
-- resource location
-- resource workers
-- resource sell price
-- resource haul fee
+- producer
+- destination
+- required haul method
+- worker
+- price
+- amount
+- haul fee
+- distance fee
+- spoil time
 """
 
 # Path to "resources" folder and list of resource names

@@ -84,4 +84,4 @@ dmypy.json
 src/files/resources/*.rsc
 src/files/towns/*.twn
 src/files/workers/*.wrk
-src/files/producers/*.pro
+src/files/producers/*.prd
