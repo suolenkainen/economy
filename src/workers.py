@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # Author: Pekka Marjamäki - Suolenkainen
+# https://github.com/suolenkainen/economy
 
 ## workers.py
 ## Description of each worker
@@ -13,7 +14,7 @@ Required attributes to be clarified. The idea is to name worker  and to link it 
 """
 
 # Path to "workers" folder and list of worker names
-worker_path = "files\\workers"
+worker_path = "resources\\workers"
 path = os.path.join(os.path.dirname(__file__), worker_path)
 workers = os.listdir(path)
 

@@ -1,49 +1,50 @@
 #!/usr/bin/env python3
 # Author: Pekka Marjamäki - Suolenkainen
+# https://github.com/suolenkainen/economy
 
-## towns.py
-## Description of each town
-## It makes .twn file to a folder "towns" and includes all relevant information
+## settlements.py
+## Description of each settlement
+## It makes .slm file to a folder "settlements" and includes all relevant information
 ## These files are then read by the main loop and added to the simulation
 
 import os
 
 """ 
 Required attributes
-- town location
-- town population
-- town workers
-- town resourses
-- town producers
-- town base wealth
+- settlement location
+- settlement population
+- settlement workers
+- settlement resourses
+- settlement producers
+- settlement base wealth
 - liquid wealth
 
-Town size grows as wealth
+settlement size grows as wealth
 """
 
-# Path to "towns" folder and list of town names
-town_path = "files\\towns"
-path = os.path.join(os.path.dirname(__file__), town_path)
-towns = os.listdir(path)
+# Path to "settlements" folder and list of settlement names
+settlement_path = "resources\\settlements"
+path = os.path.join(os.path.dirname(__file__), settlement_path)
+settlements = os.listdir(path)
 
 
-# Town creation attributes
-town_amount = 1
-postfix = "town_"
-prefix = ".twn"
+# settlement creation attributes
+settlement_amount = 1
+postfix = "settlement_"
+prefix = ".slm"
 
 
 # Before creating new files, the old directory needs to be emptied
 
-class clear_towns:
-    for t in towns:
-        if postfix in t:
-            os.remove(os.path.join(path, t))
+class clear_settlements:
+    for s in settlements:
+        if postfix in s:
+            os.remove(os.path.join(path, s))
 
-class create_town():
+class create_settlement():
     def __init__(self, attributes):
 
-        # Write attributes into .twn file
+        # Write attributes into .slm file
         coord_x, coord_y = attributes["coordinates"]
         text = "coordinate_X=" + str(coord_x) + "\n" + \
                 "coordinate_Y=" + str(coord_y) + "\n" + \
@@ -79,8 +80,8 @@ if __name__ == '__main__':
     attributes["base_wealth"] = 100
     attributes["liquid_wealth"] = 100
 
-    clear_towns()
+    clear_settlements()
 
-    for i in range(town_amount):
+    for i in range(settlement_amount):
         attributes["index"] = i
-        create_town(attributes)
+        create_settlement(attributes)

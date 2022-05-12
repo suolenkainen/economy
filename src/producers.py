@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # Author: Pekka Marjamäki - Suolenkainen
+# https://github.com/suolenkainen/economy
 
 ## producers.py
 ## Description of each producer
@@ -16,7 +17,7 @@ Required attributes
 """
 
 # Path to "producers" folder and list of producer names
-producer_path = "files\\producers"
+producer_path = "resources\\producers"
 path = os.path.join(os.path.dirname(__file__), producer_path)
 producers = os.listdir(path)
 
