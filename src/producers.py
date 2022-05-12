@@ -11,9 +11,13 @@ import os
 
 """ 
 Required attributes
-- producer location
+- producer location settlement
 - producer workers
-- produced resourses
+- produced resourses stored
+- producer required goods
+- manufacturing speed
+- maximum capacity of storaged resources
+- maximum capacity of stored goods
 """
 
 # Path to "producers" folder and list of producer names

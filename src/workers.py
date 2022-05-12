@@ -10,7 +10,16 @@
 import os
 
 """ 
-Required attributes to be clarified. The idea is to name worker  and to link it to a town or a resource production place
+Required attributes to be clarified.
+- type of worker
+- start of hauling
+- destination of hauling
+- speed of worker
+- distance of total journey
+- progression of journey
+- goods being handled
+- carrying or production capacity
+
 """
 
 # Path to "workers" folder and list of worker names
@@ -18,25 +27,65 @@ worker_path = "resources\\workers"
 path = os.path.join(os.path.dirname(__file__), worker_path)
 workers = os.listdir(path)
 
+
+# worker creation attributes
+worker_amount = 1
+postfix = "worker_"
+prefix = ".wrk"
+
+
 # Before creating new files, the old directory needs to be emptied
 
 class clear_workers:
-    for f in workers:
-        if f == "remove.wrk":
-            os.remove(os.path.join(path, f))
-            # print(os.path.join(path, f))
+    for s in workers:
+        if postfix in s:
+            os.remove(os.path.join(path, s))
+
+class create_worker():
+    def __init__(self, attributes):
+
+        # Write attributes into .wrk file
+        text = "type=" + str(attributes["type"]) + "\n" + \
+                "start=" + str(attributes["start"]) + "\n" + \
+                "destination=" + str(attributes["destination"]) + "\n" + \
+                "speed=" + str(attributes["speed"]) + "\n" + \
+                "distance=" + str(attributes["distance"]) + "\n" + \
+                "progression=" + str(attributes["progression"]) + "\n" + \
+                "goods=" + str(attributes["goods"]) + "\n" + \
+                "capacity=" + str(attributes["capacity"]) + "\n"
 
 
-# For testing purposes, recreate the .wrk file previously removed
-f = open(os.path.join(path, "remove.wrk"), "a")
-f.write("Test!")
-f.close()
+        # Create a file with a filename generate
+        filename = postfix + str(attributes["index"]) + prefix
+        f = open(os.path.join(path, filename), "a")
+        f.write(text)
+        f.close()
 
-f = open(os.path.join(path, "remove.wrk"), "r")
-print(f.read())
+        # Test that file exists with proper data
+        f = open(os.path.join(path, filename), "r")
+        print(f.read())
 
 
 if __name__ == '__main__':
     
+    
     print("main")
+
+    attributes = {}
+    attributes["type"] = "hauling"
+    attributes["start"] = "settlement_0"
+    attributes["destination"] = "settlement_1"
+    attributes["speed"] = 5
+    attributes["distance"] = 50
+    attributes["progression"] = 25
+    attributes["goods"] = ["goods_0"]
+    attributes["capacity"] = 10
+
+
     clear_workers()
+
+    for i in range(worker_amount):
+        attributes["index"] = i
+        create_worker(attributes)
+
+    ### We need some attributes to indicate a worker that is creating things, not just hauling
