@@ -59,9 +59,12 @@ def create_attributes():
     attributes["workers"] = []
     attributes["population"] = 10
     attributes["goods"] = []
+    attributes["resourcegoods"] = []
     attributes["producers"] = []
     attributes["base_wealth"] = 100
     attributes["liquid_wealth"] = 100
+    attributes["marketsell"] = {"grain": 12}
+    attributes["marketbuy"] = {"grain": 10}
     return attributes
 
 

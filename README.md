@@ -18,6 +18,8 @@ A _producer_ is a place that creates goods from either producing gathering, hunt
 ## Stage
 Currently I'm trying to create a MVP for a farm to deliver grain to a town.
 
+Utilities now contain common elements of each function that would be duplicate code for the function. This contains "file to object" and "attributes to text".
+
 ## Future plans
 - Some randomness might be introduced to production rates, etc.
 - A _path_ file will be crated between two settlemens which can the be used by workers. The condition can increase or decrease based on use.

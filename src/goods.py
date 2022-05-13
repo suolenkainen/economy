@@ -34,7 +34,7 @@ class create_goods:
     def __init__(self, attributes):
 
         # Write attributes into .gds file
-        
+
         # Create text from attributes
         text = utils.attributes_to_text(attributes)
 
@@ -57,6 +57,7 @@ def create_attributes():
     attributes["product"] = "grain"
     attributes["method"] = ""
     attributes["worker"] = "worker_0"
+    attributes["reserved"] = "worker_0"
     attributes["price"] = 5
     attributes["amount"] = 5
     attributes["capacityperitem"] = 1

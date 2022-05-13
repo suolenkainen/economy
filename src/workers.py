@@ -35,7 +35,7 @@ class create_worker():
     def __init__(self, attributes):
 
         # Write attributes into .wrk file
-        
+
         # Create text from attributes
         text = utils.attributes_to_text(attributes)
 
@@ -61,6 +61,7 @@ def create_attributes():
     attributes["progression"] = 0
     attributes["goods"] = []
     attributes["capacity"] = 100
+    attributes["order"] = 0
     return attributes
 
 

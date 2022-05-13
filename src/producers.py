@@ -33,7 +33,7 @@ class create_producer:
     def __init__(self, attributes):
 
         # Write attributes into .prd file
-        
+
         # Create text from attributes
         text = utils.attributes_to_text(attributes)
 
@@ -52,15 +52,16 @@ def create_attributes():
     # This will be randomized in the future based on something
     attributes = {}
     attributes["product"] = "grain"
+    attributes["generated"] = 10
     attributes["requirement"] = ""
     attributes["requiredperunit"] = 0
     attributes["location"] = "settlement_1"
-    attributes["workers"] = []
     attributes["storedresources"] = 0
     attributes["storedproduct"] = 0
     attributes["speed"] = 1
     attributes["maxresources"] = 100
     attributes["maxgoods"] = 100
+    attributes["size"] = 10
     return attributes
 
 
