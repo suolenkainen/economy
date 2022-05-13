@@ -61,7 +61,7 @@ def create_attributes():
     attributes["goods"] = []
     attributes["resourcegoods"] = []
     attributes["producers"] = []
-    attributes["base_wealth"] = 100
+    attributes["basewealth"] = 100
     attributes["liquid_wealth"] = 100
     attributes["marketsell"] = {"grain": 12}
     attributes["marketbuy"] = {"grain": 10}

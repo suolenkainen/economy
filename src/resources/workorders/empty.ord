@@ -1,0 +1,9 @@
+owner=producer_0
+destination=producer_1
+product=grain
+method=
+worker=worker_0
+price=5
+amount=5
+capacityperitem=1
+fee=1

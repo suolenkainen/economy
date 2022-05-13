@@ -50,9 +50,6 @@ for g in goods_files:
     existing_goods_list.append(goods_obj)
 
 
-def attach_goods_to_worker(worker, goods):
-    pass
-
 def main():
 
     running = True
@@ -88,8 +85,9 @@ def main():
 
         ## If there is a requirement in some settlement for some resource and there is room in storage, check if there is goods in near by settlement
         ## Order workers based on the closest settlement.
-        ## If not the current settlement, travel to nearest settlement. A goods can be reserved for that worker
-        ## When at the settlement,  
+        ## If not the current settlement, travel to nearest settlement. If a workorder is larger than capacity of the worker, the workorder can be split into smaller pieces
+        ## A workorder can be reserved for that worker
+        ## Same worker can do two workorders from same starting place to same destination if there is capacity and enough workorders
 
         # def create_list_of_work_orders(): (Work order means the same thing as the goods file. Maybe change goods files to work orders
         #     pass

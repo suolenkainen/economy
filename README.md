@@ -11,7 +11,9 @@ A _settlement_ is basically any settlement that has people living in it. This ca
 
 A _worker_ is a person doing something with a resource. This (at least in the beginning of the project) can be a "hauler" that moves stuff between places, a baker, a farmer, etc. Each of these workers perform tasks in production facilities and produce goods. These goods can be consumed by villagers of used for producing something else.
 
-_Goods_ are resources or items that are manipulated, moved, transformed, etc. and made into new ones or consumed. Each set of goods is considered as a set of goods that are then handled. For example a goods parcel can be "5 units of grain" or "50 units of grain".
+_Goods_ are resources or items that are manipulated, moved, transformed, etc. and made into new ones or consumed. 
+
+_Workorders_ are assignments that the workers take to move things around. Each workorder is considered as a set of goods that are handled. For example workorder can be "5 units of grain" or "50 units of grain". This can be divided into smaller orders if more than one worker is needed.
 
 A _producer_ is a place that creates goods from either producing gathering, hunting, mining, etc. them or refining new goods based on existing ones.
 

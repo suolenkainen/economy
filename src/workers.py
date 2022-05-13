@@ -59,7 +59,7 @@ def create_attributes():
     attributes["maxspeed"] = 5
     attributes["distance"] = 0
     attributes["progression"] = 0
-    attributes["goods"] = []
+    attributes["workorders"] = []
     attributes["capacity"] = 100
     attributes["order"] = 0
     return attributes
