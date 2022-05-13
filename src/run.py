@@ -51,7 +51,6 @@ for o in workorder_files:
 
 
 ## Combine buying and selling orders
-
 def combine_workorders():
 
     selling = []
@@ -60,7 +59,7 @@ def combine_workorders():
 
     # Divide the selling and buying into their of lists and sort them continuously
     for order in existing_workorder_list:
-        if order.sell == "True":
+        if order.sell == True:
             selling.append(order)
         else:
             buying.append(order)
@@ -98,13 +97,32 @@ def combine_workorders():
             else:
                 buying.extend(selling)
                 break
-        if order > len(selling):
+        if order >= len(selling):
             break
 
     print(complete_orders)
     return complete_orders, buying
 
     # handle the remaining sell and buy orders and how they affect the prices
+
+
+## Adjust the market prices based on non-successful transactions
+def adjust_settlement_markets(workorders):
+
+    # loop through workorders and combine them with settlements
+    for order in workorders:
+        ord_settlement = order.owner
+        for stlm in settlement_list:
+            if stlm.name == ord_settlement:
+
+                # Adjust the market price for that product in that settlement
+                if order.product in stlm.marketsell and order.sell == True:
+                    sellprice = stlm.marketsell[order.product]
+                    stlm.marketsell[order.product] = round(sellprice/1.05, 1)
+                if order.product in stlm.marketbuy and order.sell == False:
+                    buyprice = stlm.marketbuy[order.product]
+                    stlm.marketbuy[order.product] = round(buyprice*1.05, 1)
+
 
 
 """
@@ -145,7 +163,8 @@ def main():
         ## If there is no items not for sell at the requested price, the settlement will pay for maximum of 5% increase from the cheapest
         ## Settlement always buys from the cheapers supplier
 
-
+        transactions, incomplete = combine_workorders()
+        adjust_settlement_markets(incomplete)
 
         ## If there is a requirement in some settlement for some resource and there is room in storage, check if there is workorder in near by settlement
         ## Order workers based on the closest settlement.
@@ -157,7 +176,6 @@ def main():
         #     pass
         #     return list_of_work_orders
 
-        transactions, incomplete = combine_workorders()
 
         # for activeworker in worker_list:
         #     def search_for_nearest_requirement():

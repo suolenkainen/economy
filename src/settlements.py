@@ -54,6 +54,7 @@ def create_attributes():
 
     # This will be randomized in the future based on something
     attributes = {}
+    attributes["name"] = "settlement_0"
     attributes["coordinate_X"] = 100
     attributes["coordinate_Y"] = 100
     attributes["workers"] = []

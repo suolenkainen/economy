@@ -6,6 +6,7 @@
 ## Functions that are commonly used in modules.
 
 import os
+import ast
 
 # Function is used to return an object based on the attributes in the file
 class file_to_object:
@@ -15,6 +16,7 @@ class file_to_object:
 
         # set attributes to object based on the file
         while True:
+            
             line = stlm.readline()
             if not line:
                 break
@@ -27,6 +29,8 @@ class file_to_object:
                 attr[1] = float(attr[1])
             except:
                 pass
+            if attr[0] in ["marketsell", "marketbuy", "goods", "producers", "resourcegoods", "workers", "sell"]:
+                attr[1] = ast.literal_eval(attr[1])
             setattr(self, attr[0], attr[1])
 
 
@@ -74,7 +78,7 @@ def sales_calculator(asked, payed):
             if asked/1.05 <= payed:
                 deal = True
                 asked /= 1.05
-                
+
     # If asked price is less than what the buyer is willing to pay, then the deal is made
     elif asked < payed:
         deal = True
