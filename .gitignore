@@ -84,4 +84,4 @@ dmypy.json
 src/resources/settlements/*.slm
 src/resources/workers/*.wrk
 src/resources/producers/*.prd
-src/resources/goods/*.gds
+src/resources/workorders/*.ord

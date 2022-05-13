@@ -19,6 +19,14 @@ class file_to_object:
             if not line:
                 break
             attr = line.strip().split("=")
+            try:
+                attr[1] = int(attr[1])
+            except:
+                pass
+            try:
+                attr[1] = float(attr[1])
+            except:
+                pass
             setattr(self, attr[0], attr[1])
 
 
@@ -29,6 +37,49 @@ def attributes_to_text(attrs):
         text.append(key + "=" + str(attrs[key]) + "\n")
     print(text)
     return text
+
+
+def combine_workorders(seller, buyer):
+    # If workorders match each other, the seller order is updated and buy-order is removed
+    if seller.amount == buyer.amount:
+        seller.destination = buyer.owner
+        return seller, [], []
+
+    # If seller has more than buyer is willing to buy, a new order will be created for the surplus
+    if seller.amount > buyer.amount:
+        new_order = seller
+        seller.destination = buyer.owner
+        new_order.amount -= buyer.amount
+        return seller, [new_order], []
+
+    # If buyer wants to buy more than seller has to sell, a new order will be created for the lacking amount
+    if seller.amount < buyer.amount:
+        new_order = seller
+        seller.destination = buyer.owner
+        new_order.amount -= seller.amount
+        return seller, [], [new_order]
+
+
+# This function checks if a transaction forms a deal
+def sales_calculator(asked, payed):
+    deal = False
+            
+    #Checking that transaction is made within range of reason (5%)
+    if asked > payed:
+        if asked <= payed*1.05:
+            deal = True
+        else:
+
+            # If the selling price is just a little less than required, the price is reduced a bit by seller
+            if asked/1.05 <= payed:
+                deal = True
+                asked /= 1.05
+                
+    # If asked price is less than what the buyer is willing to pay, then the deal is made
+    elif asked < payed:
+        deal = True
+
+    return deal
 
 
 if __name__ == "__main__":

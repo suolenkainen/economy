@@ -53,6 +53,7 @@ def create_attributes():
     # This will be randomized in the future based on something
     attributes = {}
     attributes["owner"] = "settlement_0"
+    attributes["destination"] = ""
     attributes["sell"] = True
     attributes["product"] = "grain"
     attributes["method"] = ""

@@ -26,15 +26,15 @@ worker_path = "resources\\workers"
 wrkpath = os.path.join(os.path.dirname(__file__), worker_path)
 work_files = os.listdir(wrkpath)
 
-# Path to "goods" folder and list of goods names
-goods_path = "resources\\goods"
-gdspath = os.path.join(os.path.dirname(__file__), goods_path)
-goods_files = os.listdir(gdspath)
+# Path to "workorder" folder and list of workorder names
+workorder_path = "resources\\workorders"
+ordpath = os.path.join(os.path.dirname(__file__), workorder_path)
+workorder_files = os.listdir(ordpath)
 
 # A group of settlement objects
 settlement_list = []
 worker_list = []
-existing_goods_list = []
+existing_workorder_list = []
 
 # Generate objects from the settlement files
 for s in sett_files:
@@ -45,10 +45,72 @@ for w in work_files:
     workr_obj = utils.file_to_object(w, wrkpath)
     worker_list.append(workr_obj)
 
-for g in goods_files:
-    goods_obj = utils.file_to_object(g, gdspath)
-    existing_goods_list.append(goods_obj)
+for o in workorder_files:
+    workorder_obj = utils.file_to_object(o, ordpath)
+    existing_workorder_list.append(workorder_obj)
 
+
+## Combine buying and selling orders
+
+def combine_workorders():
+
+    selling = []
+    buying = []
+    complete_orders = []
+
+    # Divide the selling and buying into their of lists and sort them continuously
+    for order in existing_workorder_list:
+        if order.sell == "True":
+            selling.append(order)
+        else:
+            buying.append(order)
+        selling = sorted(selling, key=lambda d: d.price, reverse=True)
+        buying = sorted(buying, key=lambda d: d.price)
+
+    # Pairing sell and purchase orders so that the most expensive item is sold first to the least paying settlement and then increasing in price
+    order = 0
+    while True: 
+        sold = selling[order]
+        for request in buying:
+            deal = False
+            
+            # Matching the products
+            if sold.product == request.product:
+                deal = utils.sales_calculator(sold.price, request.price)
+            else:
+                continue
+        order += 1
+
+        #when deal is formed, the deal is put into a list of completed transactions. If some of the goods are not sold or remaining in the order, a new order is created
+        if deal:
+            complete_order, newsall, newbuy = utils.combine_workorders(sold, request)
+            complete_orders.append(complete_order)
+            buying.remove(request)
+            buying.extend(newbuy)
+            selling.remove(sold)
+            selling.extend(newsall)
+
+            #when adding and removing items from lists, they are sorted again
+            if len(buying) == 0 and len(selling) == 0:
+                buying = sorted(buying, key=lambda d: d.price)
+                selling = sorted(selling, key=lambda d: d.price, reverse=True)
+                order = 0
+            else:
+                buying.extend(selling)
+                break
+        if order > len(selling):
+            break
+
+    print(complete_orders)
+    return complete_orders, buying
+
+    # handle the remaining sell and buy orders and how they affect the prices
+
+
+"""
+MAIN LOOP:
+This contains the main actions that call other functions in the module
+"""
 
 def main():
 
@@ -80,18 +142,22 @@ def main():
         ## If there isn't enough buyer for a good, the production place lowers their sell price
         ## All price modifications are calculated based on the surplus/lack of products -> Utilities
         ## The work orders are always attached to a settlement instead of the production place
+        ## If there is no items not for sell at the requested price, the settlement will pay for maximum of 5% increase from the cheapest
+        ## Settlement always buys from the cheapers supplier
 
 
 
-        ## If there is a requirement in some settlement for some resource and there is room in storage, check if there is goods in near by settlement
+        ## If there is a requirement in some settlement for some resource and there is room in storage, check if there is workorder in near by settlement
         ## Order workers based on the closest settlement.
         ## If not the current settlement, travel to nearest settlement. If a workorder is larger than capacity of the worker, the workorder can be split into smaller pieces
         ## A workorder can be reserved for that worker
         ## Same worker can do two workorders from same starting place to same destination if there is capacity and enough workorders
 
-        # def create_list_of_work_orders(): (Work order means the same thing as the goods file. Maybe change goods files to work orders
+        # def create_list_of_work_orders():
         #     pass
         #     return list_of_work_orders
+
+        transactions, incomplete = combine_workorders()
 
         # for activeworker in worker_list:
         #     def search_for_nearest_requirement():
