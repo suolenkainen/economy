@@ -54,10 +54,10 @@ def create_attributes():
     # This will be randomized in the future based on something
     attributes = {}
     attributes["type"] = "walking"
-    attributes["destination"] = "settlement_0"
+    attributes["settlement"] = "settlement_0"
+    attributes["distance"] = 0
     attributes["speed"] = 0
     attributes["maxspeed"] = 5
-    attributes["distance"] = 0
     attributes["progression"] = 0
     attributes["workorders"] = []
     attributes["capacity"] = 100

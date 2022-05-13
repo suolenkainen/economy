@@ -50,6 +50,7 @@ for o in workorder_files:
     existing_workorder_list.append(workorder_obj)
 
 
+
 ## Combine buying and selling orders
 def combine_workorders():
 
@@ -105,6 +106,7 @@ def combine_workorders():
     return complete_orders, buying
 
 
+
 ## Add distance to transactions
 def transactions_distance(transactions):
 
@@ -121,7 +123,7 @@ def transactions_distance(transactions):
     
         # send the settlement info to distance calculator
         order.distance = utils.distance(starting, destination)
-
+    
 
 
 ## Adjust the market prices based on non-successful transactions
@@ -140,6 +142,44 @@ def adjust_settlement_markets(workorders):
                 if order.product in stlm.marketbuy and order.sell == False:
                     buyprice = stlm.marketbuy[order.product]
                     stlm.marketbuy[order.product] = round(buyprice*1.05, 1)
+
+
+
+## Find the closest worker to a transaction (not yet move it to there)
+def reserving_worker_to_transaction(transactions):
+
+    # loop through transactions and find the settlements and workers
+    for order in transactions:
+        
+        # Workers will be sorted and eventually closest will be chosen
+        sorted_workers = []
+
+        # Find correct settlement info
+        ord_settlement = order.owner
+        for stlm1 in settlement_list:
+            if stlm1.name == ord_settlement:
+                starting = stlm1
+                break
+
+        # Find all workers not moving
+        for worker in worker_list:
+            if worker.speed != 0:
+                continue
+            wrk_settlement = worker.settlement
+            for stlm2 in settlement_list:
+                if stlm2.name == wrk_settlement:
+                    destination = stlm2
+                    break
+            # send the settlement info to distance calculator
+            worker.distance = utils.distance(starting, destination)
+            sorted_workers.append(worker)
+            sorted_workers = sorted(sorted_workers, key=lambda d: d.distance)
+        
+        print(sorted_workers)
+        order.reserved = sorted_workers[0].name
+    print(transactions)
+
+
 
 
 
@@ -197,7 +237,7 @@ def main():
         ## A workorder can be reserved for that worker
         ## Same worker can do two workorders from same starting place to same destination if there is capacity and enough workorders
 
-
+        reserving_worker_to_transaction(transactions)
 
         # def create_list_of_work_orders():
         #     pass
