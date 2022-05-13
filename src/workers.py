@@ -53,8 +53,8 @@ class create_worker():
 def create_attributes():
     # This will be randomized in the future based on something
     attributes = {}
-    attributes["type"] = "hauling"
-    attributes["destination"] = "settlement_1"
+    attributes["type"] = "walking"
+    attributes["destination"] = "settlement_0"
     attributes["speed"] = 0
     attributes["maxspeed"] = 5
     attributes["distance"] = 0

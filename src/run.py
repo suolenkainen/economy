@@ -98,12 +98,30 @@ def combine_workorders():
                 buying.extend(selling)
                 break
         if order >= len(selling):
+            buying.extend(selling)
             break
 
     print(complete_orders)
     return complete_orders, buying
 
-    # handle the remaining sell and buy orders and how they affect the prices
+
+## Add distance to transactions
+def transactions_distance(transactions):
+
+    # loop through workorders and find the settlements 
+    for order in transactions:
+        ord_settlement1 = order.owner
+        for stlm1 in settlement_list:
+            if stlm1.name == ord_settlement1:
+                starting = stlm1
+        ord_settlement2 = order.destination
+        for stlm2 in settlement_list:
+            if stlm2.name == ord_settlement2:
+                destination = stlm2
+    
+        # send the settlement info to distance calculator
+        order.distance = utils.distance(starting, destination)
+
 
 
 ## Adjust the market prices based on non-successful transactions
@@ -123,6 +141,12 @@ def adjust_settlement_markets(workorders):
                     buyprice = stlm.marketbuy[order.product]
                     stlm.marketbuy[order.product] = round(buyprice*1.05, 1)
 
+
+
+## Attach a worker to the workorder, add money to settlement, charge the selling settlement for taxes and remove goods from settlement
+
+
+## On completing the journey, charge the settlement for goods and taxes and add them to settlement's goods
 
 
 """
@@ -161,9 +185,10 @@ def main():
         ## All price modifications are calculated based on the surplus/lack of products -> Utilities
         ## The work orders are always attached to a settlement instead of the production place
         ## If there is no items not for sell at the requested price, the settlement will pay for maximum of 5% increase from the cheapest
-        ## Settlement always buys from the cheapers supplier
+        ## Settlement always buys from the cheapest supplier
 
         transactions, incomplete = combine_workorders()
+        transactions_distance(transactions)
         adjust_settlement_markets(incomplete)
 
         ## If there is a requirement in some settlement for some resource and there is room in storage, check if there is workorder in near by settlement
@@ -171,6 +196,8 @@ def main():
         ## If not the current settlement, travel to nearest settlement. If a workorder is larger than capacity of the worker, the workorder can be split into smaller pieces
         ## A workorder can be reserved for that worker
         ## Same worker can do two workorders from same starting place to same destination if there is capacity and enough workorders
+
+
 
         # def create_list_of_work_orders():
         #     pass

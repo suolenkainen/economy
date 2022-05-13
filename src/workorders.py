@@ -62,6 +62,7 @@ def create_attributes():
     attributes["price"] = 12.00
     attributes["amount"] = 5
     attributes["capacityperitem"] = 1
+    attributes["distance"] = 0
     return attributes
 
 

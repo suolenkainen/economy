@@ -5,6 +5,7 @@
 ## utilities.py
 ## Functions that are commonly used in modules.
 
+from math import sqrt
 import os
 import ast
 
@@ -84,6 +85,20 @@ def sales_calculator(asked, payed):
         deal = True
 
     return deal
+
+
+# Distance between two settlements
+def distance(a, b):
+    xa = a.coordinate_X
+    ya = a.coordinate_Y
+    xb = b.coordinate_X
+    yb = b.coordinate_Y
+
+    x = abs(xa-xb)
+    y = abs(ya-yb)
+    d = round(sqrt(x*x + y*y), )
+
+    return d
 
 
 if __name__ == "__main__":
