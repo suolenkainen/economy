@@ -81,8 +81,7 @@ dmypy.json
 
 
 # Custom Folders
-src/resources/resources/*.rsc
 src/resources/settlements/*.slm
 src/resources/workers/*.wrk
 src/resources/producers/*.prd
-src/resources/goods/*.rsc
+src/resources/goods/*.gds

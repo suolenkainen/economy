@@ -20,32 +20,72 @@ Required attributes
 - maximum capacity of stored goods
 """
 
-# Path to "producers" folder and list of producer names
+
+# Producer file properties
 producer_path = "resources\\producers"
 path = os.path.join(os.path.dirname(__file__), producer_path)
-producers = os.listdir(path)
+postfix = "producer_"
+prefix = ".prd"
 
-# Before creating new files, the old directory needs to be emptied
 
-class clear_producers:
-    for p in producers:
-        if "remove" in p:
-            os.remove(os.path.join(path, p))
+class create_producer:
+    def __init__(self, attributes):
 
-class create_producers:
-    
+        # Write attributes into .prd file
+        text = "product=" + str(attributes["product"]) + "\n" + \
+                "requirement=" + str(attributes["requirement"]) + "\n" + \
+                "requiredperunit=" + str(attributes["requiredperunit"]) + "\n" + \
+                "location=" + str(attributes["location"]) + "\n" + \
+                "workers=" + str(attributes["workers"]) + "\n" + \
+                "storedresources=" + str(attributes["storedresources"]) + "\n" + \
+                "storedproduct=" + str(attributes["storedproduct"]) + "\n" + \
+                "speed=" + str(attributes["speed"]) + "\n" + \
+                "maxresources=" + str(attributes["maxresources"]) + "\n" + \
+                "maxgoods=" + str(attributes["maxgoods"])
 
-    # For testing purposes, recreate the .prd file previously removed
-    f = open(os.path.join(path, "remove2.prd"), "a")
-    f.write("Test!")
-    f.close()
+        # Create a file with a filename generate
+        filename = postfix + str(attributes["index"]) + prefix
+        f = open(os.path.join(path, filename), "w")
+        f.writelines(text)
 
-    f = open(os.path.join(path, "remove2.prd"), "r")
-    print(f.read())
+        # Test that file exists with proper data
+        f = open(os.path.join(path, filename), "r")
+        print(f.read())
+        f.close()
+
+
+def create_attributes():
+    # This will be randomized in the future based on something
+    attributes = {}
+    attributes["product"] = "grain"
+    attributes["requirement"] = ""
+    attributes["requiredperunit"] = 0
+    attributes["location"] = "settlement_1"
+    attributes["workers"] = []
+    attributes["storedresources"] = 0
+    attributes["storedproduct"] = 0
+    attributes["speed"] = 1
+    attributes["maxresources"] = 100
+    attributes["maxgoods"] = 100
+    return attributes
 
 
 if __name__ == '__main__':
     
+     # Test producer creation attributes
+    producer_amount = 1
+    producers = os.listdir(path)
+
+    # Before creating new files, the old directory needs to be emptied
+    class clear_producers:
+        for s in producers:
+            if postfix in s:
+                os.remove(os.path.join(path, s))
+    
     print("main")
-    clear_producers()
-    create_producers()
+
+    attributes = create_attributes()
+
+    for i in range(producer_amount):
+        attributes["index"] = i
+        create_producer(attributes)

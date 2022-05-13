@@ -12,9 +12,8 @@ import os
 """ 
 Required attributes to be clarified.
 - type of worker
-- start of hauling
-- destination of hauling
-- speed of worker
+- destination of work order (when not hauling, destination is the current settlement)
+- speed of worker (when not hauling anything, speed is 0)
 - distance of total journey
 - progression of journey
 - goods being handled
@@ -22,67 +21,68 @@ Required attributes to be clarified.
 
 """
 
-# Path to "workers" folder and list of worker names
+
+
+# worker file properties
 worker_path = "resources\\workers"
 path = os.path.join(os.path.dirname(__file__), worker_path)
-workers = os.listdir(path)
-
-
-# worker creation attributes
-worker_amount = 1
 postfix = "worker_"
 prefix = ".wrk"
 
-
-# Before creating new files, the old directory needs to be emptied
-
-class clear_workers:
-    for s in workers:
-        if postfix in s:
-            os.remove(os.path.join(path, s))
 
 class create_worker():
     def __init__(self, attributes):
 
         # Write attributes into .wrk file
         text = "type=" + str(attributes["type"]) + "\n" + \
-                "start=" + str(attributes["start"]) + "\n" + \
                 "destination=" + str(attributes["destination"]) + "\n" + \
                 "speed=" + str(attributes["speed"]) + "\n" + \
+                "maxspeed=" + str(attributes["speed"]) + "\n" + \
                 "distance=" + str(attributes["distance"]) + "\n" + \
                 "progression=" + str(attributes["progression"]) + "\n" + \
                 "goods=" + str(attributes["goods"]) + "\n" + \
-                "capacity=" + str(attributes["capacity"]) + "\n"
-
+                "capacity=" + str(attributes["capacity"])
 
         # Create a file with a filename generate
         filename = postfix + str(attributes["index"]) + prefix
-        f = open(os.path.join(path, filename), "a")
-        f.write(text)
-        f.close()
+        f = open(os.path.join(path, filename), "w")
+        f.writelines(text)
 
         # Test that file exists with proper data
         f = open(os.path.join(path, filename), "r")
         print(f.read())
+        f.close()
+
+
+def create_attributes():
+    # This will be randomized in the future based on something
+    attributes = {}
+    attributes["type"] = "hauling"
+    attributes["destination"] = "settlement_1"
+    attributes["speed"] = 0
+    attributes["maxspeed"] = 5
+    attributes["distance"] = 0
+    attributes["progression"] = 0
+    attributes["goods"] = []
+    attributes["capacity"] = 100
+    return attributes
 
 
 if __name__ == '__main__':
     
+     # Test worker creation attributes
+    worker_amount = 1
+    workers = os.listdir(path)
+
+    # Before creating new files, the old directory needs to be emptied
+    class clear_workers:
+        for s in workers:
+            if postfix in s:
+                os.remove(os.path.join(path, s))
     
     print("main")
 
-    attributes = {}
-    attributes["type"] = "hauling"
-    attributes["start"] = "settlement_0"
-    attributes["destination"] = "settlement_1"
-    attributes["speed"] = 5
-    attributes["distance"] = 50
-    attributes["progression"] = 25
-    attributes["goods"] = ["goods_0"]
-    attributes["capacity"] = 10
-
-
-    clear_workers()
+    attributes = create_attributes()
 
     for i in range(worker_amount):
         attributes["index"] = i

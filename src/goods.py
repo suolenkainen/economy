@@ -11,41 +11,82 @@ import os
 
 """ 
 Required attributes
-- producer
-- destination
+- owner (the goods are owned by the last settlement it was in)
+- destination (destination can be "consumed" and the requires no hauling)
 - required haul method
 - worker
 - price
 - amount
+- capacity per item
 - haul fee
-- distance fee
-- spoil time
 """
 
-# Path to "goods" folder and list of good names
+
+# goods file properties
 goods_path = "resources\\goods"
 path = os.path.join(os.path.dirname(__file__), goods_path)
-goods = os.listdir(path)
-
-# Before creating new files, the old directory needs to be emptied
-
-class clear_goods:
-    for f in goods:
-        if f == "remove.gds":
-            os.remove(os.path.join(path, f))
-            # print(os.path.join(path, f))
+postfix = "goods_"
+prefix = ".gds"
 
 
-# For testing purposes, recreate the .gds file previously removed
-f = open(os.path.join(path, "remove.gds"), "a")
-f.write("Test!")
-f.close()
+class create_goods:
+    def __init__(self, attributes):
 
-f = open(os.path.join(path, "remove.gds"), "r")
-print(f.read())
+        # Write attributes into .gds file
+        text = "owner=" + str(attributes["owner"]) + "\n" + \
+                "destination=" + str(attributes["destination"]) + "\n" + \
+                "product=" + str(attributes["product"]) + "\n" + \
+                "method=" + str(attributes["method"]) + "\n" + \
+                "worker=" + str(attributes["worker"]) + "\n" + \
+                "price=" + str(attributes["price"]) + "\n" + \
+                "amount=" + str(attributes["amount"]) + "\n" + \
+                "capacityperitem=" + str(attributes["capacityperitem"]) + "\n" + \
+                "fee=" + str(attributes["fee"])
+
+        # Create a file with a filename generate
+        filename = postfix + str(attributes["index"]) + prefix
+        f = open(os.path.join(path, filename), "w")
+        f.writelines(text)
+
+        # Test that file exists with proper data
+        f = open(os.path.join(path, filename), "r")
+        print(f.read())
+        f.close()
+
+
+def create_attributes():
+    # This will be randomized in the future based on something
+    attributes = {}
+    attributes["owner"] = "producer_0"
+    attributes["destination"] = "producer_1"
+    attributes["product"] = "grain"
+    attributes["method"] = ""
+    attributes["worker"] = "worker_0"
+    attributes["price"] = 5
+    attributes["amount"] = 5
+    attributes["capacityperitem"] = 1
+    attributes["fee"] = 1
+    return attributes
+
+
 
 
 if __name__ == '__main__':
     
+     # Test goods creation attributes
+    goods_amount = 1
+    goods = os.listdir(path)
+
+    # Before creating new files, the old directory needs to be emptied
+    class clear_goods:
+        for s in goods:
+            if postfix in s:
+                os.remove(os.path.join(path, s))
+    
     print("main")
-    clear_goods()
+
+    attributes = create_attributes()
+
+    for i in range(goods_amount):
+        attributes["index"] = i
+        create_goods(attributes)
