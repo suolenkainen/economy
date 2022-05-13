@@ -8,6 +8,7 @@
 ## These files are then read by the main loop and added to the simulation
 
 import os
+import utilities as utils
 
 """ 
 Required attributes
@@ -32,16 +33,9 @@ class create_producer:
     def __init__(self, attributes):
 
         # Write attributes into .prd file
-        text = "product=" + str(attributes["product"]) + "\n" + \
-                "requirement=" + str(attributes["requirement"]) + "\n" + \
-                "requiredperunit=" + str(attributes["requiredperunit"]) + "\n" + \
-                "location=" + str(attributes["location"]) + "\n" + \
-                "workers=" + str(attributes["workers"]) + "\n" + \
-                "storedresources=" + str(attributes["storedresources"]) + "\n" + \
-                "storedproduct=" + str(attributes["storedproduct"]) + "\n" + \
-                "speed=" + str(attributes["speed"]) + "\n" + \
-                "maxresources=" + str(attributes["maxresources"]) + "\n" + \
-                "maxgoods=" + str(attributes["maxgoods"])
+        
+        # Create text from attributes
+        text = utils.attributes_to_text(attributes)
 
         # Create a file with a filename generate
         filename = postfix + str(attributes["index"]) + prefix

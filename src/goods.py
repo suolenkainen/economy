@@ -8,6 +8,7 @@
 ## These files are then read by the main loop and added to the simulation
 
 import os
+import utilities as utils
 
 """ 
 Required attributes
@@ -33,15 +34,9 @@ class create_goods:
     def __init__(self, attributes):
 
         # Write attributes into .gds file
-        text = "owner=" + str(attributes["owner"]) + "\n" + \
-                "destination=" + str(attributes["destination"]) + "\n" + \
-                "product=" + str(attributes["product"]) + "\n" + \
-                "method=" + str(attributes["method"]) + "\n" + \
-                "worker=" + str(attributes["worker"]) + "\n" + \
-                "price=" + str(attributes["price"]) + "\n" + \
-                "amount=" + str(attributes["amount"]) + "\n" + \
-                "capacityperitem=" + str(attributes["capacityperitem"]) + "\n" + \
-                "fee=" + str(attributes["fee"])
+        
+        # Create text from attributes
+        text = utils.attributes_to_text(attributes)
 
         # Create a file with a filename generate
         filename = postfix + str(attributes["index"]) + prefix

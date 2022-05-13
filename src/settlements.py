@@ -8,7 +8,7 @@
 ## These files are then read by the main loop and added to the simulation
 
 import os
-import utilities
+import utilities as utils
 
 """ 
 Required attributes
@@ -35,15 +35,9 @@ class create_settlement():
     def __init__(self, attributes):
 
         # Write attributes into .slm file
-        coord_x, coord_y = attributes["coordinates"]
-        text = ["coordinate_X=" + str(coord_x) + "\n",
-                "coordinate_Y=" + str(coord_y) + "\n",
-                "workers=" + str(attributes["workers"]) + "\n",
-                "population=" + str(attributes["population"]) + "\n",
-                "goods=" + str(attributes["goods"]) + "\n",
-                "producers=" + str(attributes["producers"]) + "\n",
-                "base_wealth=" + str(attributes["base_wealth"]) + "\n",
-                "liquid_wealth=" + str(attributes["liquid_wealth"])]
+
+        # Create text from attributes
+        text = utils.attributes_to_text(attributes)
 
         # Create a file with a filename generate
         filename = postfix + str(attributes["index"]) + prefix
@@ -60,7 +54,8 @@ def create_attributes():
 
     # This will be randomized in the future based on something
     attributes = {}
-    attributes["coordinates"] = [100, 100]
+    attributes["coordinate_X"] = 100
+    attributes["coordinate_Y"] = 100
     attributes["workers"] = []
     attributes["population"] = 10
     attributes["goods"] = []

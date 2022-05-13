@@ -8,6 +8,7 @@
 ## These files are then read by the main loop and added to the simulation
 
 import os
+import utilities as utils
 
 """ 
 Required attributes to be clarified.
@@ -34,14 +35,9 @@ class create_worker():
     def __init__(self, attributes):
 
         # Write attributes into .wrk file
-        text = "type=" + str(attributes["type"]) + "\n" + \
-                "destination=" + str(attributes["destination"]) + "\n" + \
-                "speed=" + str(attributes["speed"]) + "\n" + \
-                "maxspeed=" + str(attributes["speed"]) + "\n" + \
-                "distance=" + str(attributes["distance"]) + "\n" + \
-                "progression=" + str(attributes["progression"]) + "\n" + \
-                "goods=" + str(attributes["goods"]) + "\n" + \
-                "capacity=" + str(attributes["capacity"])
+        
+        # Create text from attributes
+        text = utils.attributes_to_text(attributes)
 
         # Create a file with a filename generate
         filename = postfix + str(attributes["index"]) + prefix
