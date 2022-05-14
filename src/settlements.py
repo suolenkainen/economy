@@ -59,8 +59,8 @@ def create_attributes():
     attributes["coordinate_Y"] = 100
     attributes["workers"] = []
     attributes["population"] = 10
-    attributes["goods"] = []
-    attributes["resourcegoods"] = []
+    attributes["goods"] = {"grain": 10}
+    attributes["resourcegoods"] = {}
     attributes["producers"] = []
     attributes["basewealth"] = 100
     attributes["liquid_wealth"] = 100

@@ -146,10 +146,14 @@ def adjust_settlement_markets(workorders):
 
 
 ## Find the closest worker to a transaction (not yet move it to there)
-def reserving_worker_to_transaction(transactions):
+def attaching_worker_to_transaction(transactions):
 
     # loop through transactions and find the settlements and workers
     for order in transactions:
+
+        # Only reserve orders that already don't have a worker assigned
+        if order.reserved != "":
+            continue
         
         # Workers will be sorted and eventually closest will be chosen
         sorted_workers = []
@@ -175,15 +179,44 @@ def reserving_worker_to_transaction(transactions):
             sorted_workers.append(worker)
             sorted_workers = sorted(sorted_workers, key=lambda d: d.distance)
         
+        # Attach the worker to the attributes in the transaction
         print(sorted_workers)
-        order.reserved = sorted_workers[0].name
-    print(transactions)
+        if sorted_workers[0].distance == 0:
+            order.worker = sorted_workers[0].name
+            order.reserved = sorted_workers[0].name
+        else:
+            order.reserved = sorted_workers[0].name
+
+        # Attach the transaction to worker's list (currently filename but later some other identifier)
+        sorted_workers[0].workorders.append(order.filename)
 
 
 
+## Add money to settlement, charge the selling settlement for taxes and remove goods from settlement
+def begin_transaction(transactions):
+    for order in transactions:
 
+        # Only reserve orders that already don't have a worker assigned
+        if order.reserved == "" or order.worker == "":
+            continue
 
-## Attach a worker to the workorder, add money to settlement, charge the selling settlement for taxes and remove goods from settlement
+        # Find correct settlement info
+        seller_stlm = order.owner
+        for seller in settlement_list:
+            if seller.name == seller_stlm:
+
+                # Seller get's paid for the transaction and pays taxes and fees
+                price = order.amount * order.price
+                seller.liquid_wealth += price
+                seller.liquid_wealth -= price*0.1
+
+                # Remove goods from settlement
+                try:
+                    x = seller.goods[order.product]
+                except:
+                    seller.goods[order.product] = 0
+                seller.goods[order.product] -= order.amount
+        
 
 
 ## On completing the journey, charge the settlement for goods and taxes and add them to settlement's goods
@@ -237,7 +270,13 @@ def main():
         ## A workorder can be reserved for that worker
         ## Same worker can do two workorders from same starting place to same destination if there is capacity and enough workorders
 
-        reserving_worker_to_transaction(transactions)
+        attaching_worker_to_transaction(transactions)
+        begin_transaction(transactions)
+        ## Worker walks until at destination
+        for w in worker_list:
+            if w == 0:
+                pass
+        break
 
         # def create_list_of_work_orders():
         #     pass

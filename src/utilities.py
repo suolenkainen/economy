@@ -30,7 +30,7 @@ class file_to_object:
                 attr[1] = float(attr[1])
             except:
                 pass
-            if attr[0] in ["marketsell", "marketbuy", "goods", "producers", "resourcegoods", "workers", "sell"]:
+            if attr[0] in ["marketsell", "marketbuy", "goods", "producers", "resourcegoods", "workers", "sell", "workorders"]:
                 attr[1] = ast.literal_eval(attr[1])
             setattr(self, attr[0], attr[1])
 
