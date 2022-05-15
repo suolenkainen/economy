@@ -3,18 +3,23 @@
 # https://github.com/suolenkainen/economy
 
 import os
-from numpy import place
 import pygame
-import settlements as smtns
+import settlements as sett
 import utilities as utils
+import workers as wrk
+import workorders as ord
+import producers as pro
 
-# town = towns.create_town()
-# print(town_list.__dict__)
+### Running ID's for item types
+settlement_last_id = 2
+worker_last_id = 1
+producer_last_id = 1
+workorder_last_id = 2
 
 for i in range(1):
-    attr = smtns.create_attributes()
+    attr = sett.create_attributes()
     attr["index"] = i
-    smtns.create_settlement(attr)
+    sett.create_settlement(attr)
 
 # Path to "settlements" folder and list of settlement names
 settlement_path = "resources\\settlements"
@@ -41,14 +46,22 @@ for s in sett_files:
     settlement_obj = utils.file_to_object(s, setpath)
     settlement_list.append(settlement_obj)
 
+sett_objects = sett.create_settlements_from_configures()
+
+
 for w in work_files:
     workr_obj = utils.file_to_object(w, wrkpath)
     worker_list.append(workr_obj)
+
+wrk_objects = wrk.create_worker_from_configures()
 
 for o in workorder_files:
     workorder_obj = utils.file_to_object(o, ordpath)
     existing_workorder_list.append(workorder_obj)
 
+ord_objects = ord.create_workorders_from_configures()
+
+prod_objects = pro.create_producers_from_configures()
 
 
 ## Combine buying and selling orders
