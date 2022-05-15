@@ -86,7 +86,7 @@ def create_settlement_from_configures():
             break
 
         # Create object from settlement data
-        obj = utils.settlement_to_object(settlement)
+        obj = utils.conf_data_to_object(settlement)
         settlements.append(obj)
     return settlements
 

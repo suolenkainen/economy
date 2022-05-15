@@ -37,15 +37,15 @@ class file_to_object:
 
 
 # Temprary tool
-class settlement_to_object:
+class conf_data_to_object:
     def __init__(self, line):
 
         # split the data row into text form attributes
-        stlm_data = line.strip().split(",")
+        data = line.strip().split(",")
         
         # For each attribute in the line, divide it into parameteds and add them to object as object attributes
-        for stlm in stlm_data:
-            attr = stlm.strip().split("=")
+        for d in data:
+            attr = d.strip().split("=")
             try:
                 attr[1] = int(attr[1])
             except:
@@ -55,7 +55,7 @@ class settlement_to_object:
                     pass
 
             # For dicts and lists, use literal eval to transform string into appropriate data type
-            if attr[0] in ["marketsell", "marketbuy", "goods", "producers", "workers"]:
+            if attr[0] in ["marketsell", "marketbuy", "goods", "producers", "workers", "workorders"]:
                 attr[1] = ast.literal_eval(attr[1])
             
             # Add attributes to object

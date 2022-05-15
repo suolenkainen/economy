@@ -65,24 +65,48 @@ def create_attributes():
     return attributes
 
 
+
+## Creates worker objects where the files were used before
+def create_worker_from_configures():
+    path = os.path.join(os.path.dirname(__file__), "resources")
+    conf = open(os.path.join(path, "workers.conf"), "r")
+
+    # ALl settlements in the file
+    workers = []
+
+    # set attributes to object based on the file
+    while True:
+        
+        worker = conf.readline()
+        if not worker:
+            break
+
+        # Create object from settlement data
+        obj = utils.conf_data_to_object(worker)
+        workers.append(obj)
+    return workers
+
+
+
 if __name__ == '__main__':
     
-     # Test worker creation attributes
-    worker_amount = 1
-    workers = os.listdir(path)
+    #  # Test worker creation attributes
+    # worker_amount = 1
+    # workers = os.listdir(path)
 
-    # Before creating new files, the old directory needs to be emptied
-    class clear_workers:
-        for s in workers:
-            if postfix in s:
-                os.remove(os.path.join(path, s))
+    # # Before creating new files, the old directory needs to be emptied
+    # class clear_workers:
+    #     for s in workers:
+    #         if postfix in s:
+    #             os.remove(os.path.join(path, s))
     
-    print("main")
+    # print("main")
 
-    attributes = create_attributes()
+    # attributes = create_attributes()
 
-    for i in range(worker_amount):
-        attributes["index"] = i
-        create_worker(attributes)
+    # for i in range(worker_amount):
+    #     attributes["index"] = i
+    #     create_worker(attributes)
 
-    ### We need some attributes to indicate a worker that is creating things, not just hauling
+    wrkr_objects = create_worker_from_configures()
+    print(wrkr_objects)
