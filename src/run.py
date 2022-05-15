@@ -122,7 +122,7 @@ def transactions_distance(transactions):
                 destination = stlm2
     
         # send the settlement info to distance calculator
-        order.distance = utils.distance(starting, destination)
+        order.distance = utils.distance_calculator(starting, destination)
     
 
 
@@ -176,7 +176,7 @@ def reserving_transaction_to_worker(transactions):
                     break
 
             # send the settlement info to distance calculator
-            worker.distance = utils.distance(starting, destination)
+            worker.distance = utils.distance_calculator(starting, destination)
             sorted_workers.append(worker)
             sorted_workers = sorted(sorted_workers, key=lambda d: d.distance)
         
@@ -242,7 +242,7 @@ def worker_owning_transaction(transactions):
                     break
 
             # send the settlement info to distance calculator
-            worker.distance = utils.distance(starting, destination)
+            worker.distance = utils.distance_calculator(starting, destination)
             if worker.distance == 0:
 
                 # Set the worker distance

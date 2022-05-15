@@ -88,7 +88,7 @@ def sales_calculator(asked, payed):
 
 
 # Distance between two settlements
-def distance(a, b):
+def distance_calculator(a, b):
     xa = a.coordinate_X
     ya = a.coordinate_Y
     xb = b.coordinate_X
