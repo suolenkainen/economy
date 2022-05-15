@@ -7,7 +7,10 @@ I chose python as a language for this because I'm most familiar with it. I also 
 ## Approach
 I create files that are the basis of the program. There are files for settlement, workers (people actually working, not just villagers), goods (the item being delivered) and producers (places that produce goods). These are then manipulated to perform the functions.
 
-A _settlement_ is basically any settlement that has people living in it. This can be a farming complex, a mine, a village with 20 people in it, or a mighty city with tens of bakeries, coopers, etc. These settlement have various goods that are consumed by production places and villagers.
+A _settlement_ is basically any settlement that has people living in it. This can be a farming complex, a mine, a village with 20 people in it, or a mighty city with tens of bakeries, coopers, etc. These settlement have various goods that are consumed by production places and villagers. Some settlements irregularly require some luxury items (jewlwery, meat, clothes, etc.) that are only requiested for a brief time. Most usual settlements are the following:
+- Farming settlement with 5 inhabitants (produces _grain_)
+- Hamlet with 20 inhabitants (produces _bread from grain_ which is then divided to citizens so that all inhabitants are fed and the rest is sold.)
+- ...
 
 A _worker_ is a person doing something with a resource. This (at least in the beginning of the project) can be a "hauler" that moves stuff between places, a baker, a farmer, etc. Each of these workers perform tasks in production facilities and produce goods. These goods can be consumed by villagers of used for producing something else. _Technically_ a worker is the payer and the receiver of the money from transactions between settlements, but there is no actual cash reserve on the workers
 
@@ -29,4 +32,4 @@ Utilities now contain common elements of each function that would be duplicate c
 - Worker cash reserve (maybe loaning from settlements)
 
 ## Testing
-Testing is done using *pytest*. TBD.
+Testing is done using *unittest*. TBD.

@@ -303,6 +303,10 @@ def main():
             y = int(s.coordinate_Y)
             pygame.draw.rect(screen, (0,0,0), (x, y, 5, 5))
 
+            # Make the display and settlements larger and add text next to them representing the workorders. 
+            # Mark the workorders in other color if made into transactions
+
+
         ## Work orders are created by demand of a production place or a settlement population
         ## A production place always aims to have their resource storage filled and goods emptied
         ## If there isn't enough suppliers for a resource, the production place boosts up their buy market price
