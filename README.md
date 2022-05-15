@@ -27,3 +27,6 @@ Utilities now contain common elements of each function that would be duplicate c
 - A _path_ file will be crated between two settlemens which can the be used by workers. The condition can increase or decrease based on use.
 - When there are crossing between delivery paths, a new town may form.
 - Worker cash reserve (maybe loaning from settlements)
+
+## Testing
+Testing is done using *pytest*. TBD.
