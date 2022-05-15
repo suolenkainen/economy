@@ -96,7 +96,7 @@ def distance(a, b):
 
     x = abs(xa-xb)
     y = abs(ya-yb)
-    d = round(sqrt(x*x + y*y), )
+    d = round(sqrt(x*x + y*y))
 
     return d
 

@@ -146,7 +146,7 @@ def adjust_settlement_markets(workorders):
 
 
 ## Find the closest worker to a transaction (not yet move it to there)
-def attaching_worker_to_transaction(transactions):
+def reserving_transaction_to_worker(transactions):
 
     # loop through transactions and find the settlements and workers
     for order in transactions:
@@ -174,18 +174,14 @@ def attaching_worker_to_transaction(transactions):
                 if stlm2.name == wrk_settlement:
                     destination = stlm2
                     break
+
             # send the settlement info to distance calculator
             worker.distance = utils.distance(starting, destination)
             sorted_workers.append(worker)
             sorted_workers = sorted(sorted_workers, key=lambda d: d.distance)
         
         # Attach the worker to the attributes in the transaction
-        print(sorted_workers)
-        if sorted_workers[0].distance == 0:
-            order.worker = sorted_workers[0].name
-            order.reserved = sorted_workers[0].name
-        else:
-            order.reserved = sorted_workers[0].name
+        order.reserved = sorted_workers[0].name
 
         # Attach the transaction to worker's list (currently filename but later some other identifier)
         sorted_workers[0].workorders.append(order.filename)
@@ -216,7 +212,65 @@ def begin_transaction(transactions):
                 except:
                     seller.goods[order.product] = 0
                 seller.goods[order.product] -= order.amount
-        
+
+
+
+## When worker is at 0 distance to transaction start, the worker will be owning the transaction
+def worker_owning_transaction(transactions):
+        # loop through transactions and find the settlements and workers
+    for order in transactions:
+
+        # Only reserve orders that already don't have a worker assigned
+        if order.reserved == "":
+            continue
+
+        # Find correct settlement info
+        ord_settlement = order.owner
+        for stlm1 in settlement_list:
+            if stlm1.name == ord_settlement:
+                starting = stlm1
+                break
+
+        # Find all workers not moving
+        for worker in worker_list:
+            if worker.speed != 0:
+                continue
+            wrk_settlement = worker.settlement
+            for stlm2 in settlement_list:
+                if stlm2.name == wrk_settlement:
+                    destination = stlm2
+                    break
+
+            # send the settlement info to distance calculator
+            worker.distance = utils.distance(starting, destination)
+            if worker.distance == 0:
+
+                # Set the worker distance
+                worker.settlement = order.destination
+                worker.distance = order.distance
+                worker.speed = worker.maxspeed
+                order.worker = worker.name
+
+
+## Move workers towards the destionation and make a list of finished journeys. This includer journeys to transaction starts
+def worker_journey(transactions):
+    
+    # Find all workers with workorders
+    finished_journeys = []
+    for w in worker_list:
+        for ord in transactions:
+            if  ord.filename in w.workorders:
+                for stlm in settlement_list:
+                    if stlm.name == ord.destination:
+                        # Move worker with their maximum speed towards destination 
+                        speed = w.maxspeed
+                        w.progression += speed
+                        if w.progression >= w.distance:
+                            finished_journeys.append(w.filename)
+                            print("DONE")
+                
+    return finished_journeys
+
 
 
 ## On completing the journey, charge the settlement for goods and taxes and add them to settlement's goods
@@ -270,13 +324,18 @@ def main():
         ## A workorder can be reserved for that worker
         ## Same worker can do two workorders from same starting place to same destination if there is capacity and enough workorders
 
-        attaching_worker_to_transaction(transactions)
+        reserving_transaction_to_worker(transactions)
+        worker_owning_transaction(transactions)
         begin_transaction(transactions)
+
         ## Worker walks until at destination
+        finished_journeys = worker_journey(transactions)
+        if finished_journeys != []:
+            # handle the finished orders
+            print(123)
         for w in worker_list:
             if w == 0:
                 pass
-        break
 
         # def create_list_of_work_orders():
         #     pass
