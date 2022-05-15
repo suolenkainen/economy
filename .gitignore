@@ -87,3 +87,5 @@ src/resources/producers/*.prd
 src/resources/workorders/*.ord
 src/resources/settlements.conf
 src/resources/workers.conf
+src/resources/producers.conf
+src/resources/workorders.conf

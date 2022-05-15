@@ -49,6 +49,7 @@ class create_workorder:
         f.close()
 
 
+### Obsolete
 def create_attributes():
     # This will be randomized in the future based on something
     attributes = {}
@@ -66,22 +67,61 @@ def create_attributes():
     return attributes
 
 
+
+# This is a utility class to create object within this module instead of utility module
+class workorder_object:
+    def __init__(self, data):
+        #create an object in workorder module
+        for attr in data:
+        
+            # Add attributes to object
+            setattr(self, attr[0], attr[1])
+
+
+
+## Creates workorder objects where the files were used before
+def create_workorders_from_configures():
+    path = os.path.join(os.path.dirname(__file__), "resources")
+    conf = open(os.path.join(path, "workorders.conf"), "r")
+
+    # All workorders in the file
+    workorders = []
+
+    # set attributes to object based on the file
+    while True:
+        
+        workorder = conf.readline()
+        if not workorder:
+            break
+
+        # Create object from workorder data using "workorder_object" class
+        data = utils.conf_data_to_attribute_list(workorder)
+        obj = workorder_object(data)
+        workorders.append(obj)
+
+    return workorders
+
+
+
 if __name__ == '__main__':
     
-     # Test workorder creation attributes
-    workorders_amount = 1
-    workorders = os.listdir(path)
+    #  # Test workorder creation attributes
+    # workorders_amount = 1
+    # workorders = os.listdir(path)
 
-    # Before creating new files, the old directory needs to be emptied
-    class clear_workorders:
-        for s in workorders:
-            if postfix in s:
-                os.remove(os.path.join(path, s))
+    # # Before creating new files, the old directory needs to be emptied
+    # class clear_workorders:
+    #     for s in workorders:
+    #         if postfix in s:
+    #             os.remove(os.path.join(path, s))
     
-    print("main")
+    # print("main")
 
-    attributes = create_attributes()
+    # attributes = create_attributes()
 
-    for i in range(workorders_amount):
-        attributes["index"] = i
-        create_workorder(attributes)
+    # for i in range(workorders_amount):
+    #     attributes["index"] = i
+    #     create_workorder(attributes)
+    
+    wrord_objects = create_workorders_from_configures()
+    print(wrord_objects)

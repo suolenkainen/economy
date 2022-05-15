@@ -47,7 +47,7 @@ class create_producer:
         print(f.read())
         f.close()
 
-
+### Obsolete
 def create_attributes():
     # This will be randomized in the future based on something
     attributes = {}
@@ -64,23 +64,59 @@ def create_attributes():
     attributes["size"] = 10
     return attributes
 
+# This is a utility class to create object within this module instead of utility module
+class producer_object:
+    def __init__(self, data):
+        #create an object in producer module
+        for attr in data:
+        
+            # Add attributes to object
+            setattr(self, attr[0], attr[1])
+
+
+## Creates production site objects where the files were used before
+def create_producers_from_configures():
+    path = os.path.join(os.path.dirname(__file__), "resources")
+    conf = open(os.path.join(path, "producers.conf"), "r")
+
+    # ALl settlements in the file
+    producers = []
+
+    # set attributes to object based on the file
+    while True:
+        
+        producer = conf.readline()
+        if not producer:
+            break
+
+        # Create object from settlement data using "producer_object" class
+        data = utils.conf_data_to_attribute_list(producer)
+        obj = producer_object(data)
+        producers.append(obj)
+
+    return producers
+
+
 
 if __name__ == '__main__':
     
-     # Test producer creation attributes
-    producer_amount = 1
-    producers = os.listdir(path)
+    #  # Test producer creation attributes
+    # producer_amount = 1
+    # producers = os.listdir(path)
 
-    # Before creating new files, the old directory needs to be emptied
-    class clear_producers:
-        for s in producers:
-            if postfix in s:
-                os.remove(os.path.join(path, s))
+    # # Before creating new files, the old directory needs to be emptied
+    # class clear_producers:
+    #     for s in producers:
+    #         if postfix in s:
+    #             os.remove(os.path.join(path, s))
     
-    print("main")
+    # print("main")
 
-    attributes = create_attributes()
+    # attributes = create_attributes()
 
-    for i in range(producer_amount):
-        attributes["index"] = i
-        create_producer(attributes)
+    # for i in range(producer_amount):
+    #     attributes["index"] = i
+    #     create_producer(attributes)
+
+    prod_objects = create_producers_from_configures()
+    print(prod_objects)

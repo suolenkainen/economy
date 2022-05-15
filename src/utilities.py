@@ -6,9 +6,10 @@
 ## Functions that are commonly used in modules.
 
 from math import sqrt
-import os
-import ast
+import os, ast
 
+
+## Obsolete
 # Function is used to return an object based on the attributes in the file
 class file_to_object:
     def __init__(self, filename, path):
@@ -36,30 +37,30 @@ class file_to_object:
 
 
 
-# Temprary tool
-class conf_data_to_object:
-    def __init__(self, line):
+# Configuration data to a list of attributes tool
+def conf_data_to_attribute_list(line):
 
-        # split the data row into text form attributes
-        data = line.strip().split(",")
-        
-        # For each attribute in the line, divide it into parameteds and add them to object as object attributes
-        for d in data:
-            attr = d.strip().split("=")
+    # split the data row into text form attributes
+    data = line.strip().split(",")
+    
+    # For each attribute in the line, divide it into parameteds and add them to object as object attributes
+    for i, d in enumerate(data):
+        attr = d.strip().split("=")
+        try:
+            attr[1] = int(attr[1])
+        except:
             try:
-                attr[1] = int(attr[1])
+                attr[1] = float(attr[1])
             except:
-                try:
-                    attr[1] = float(attr[1])
-                except:
-                    pass
+                pass
 
-            # For dicts and lists, use literal eval to transform string into appropriate data type
-            if attr[0] in ["marketsell", "marketbuy", "goods", "producers", "workers", "workorders"]:
-                attr[1] = ast.literal_eval(attr[1])
-            
-            # Add attributes to object
-            setattr(self, attr[0], attr[1])
+        # For dicts and lists, use literal eval to transform string into appropriate data type
+        if attr[0] in ["marketsell", "marketbuy", "goods", "producers", "workers", "workorders", "requirements"]:
+            attr[1] = ast.literal_eval(attr[1])
+        
+        data[i] = attr
+    
+    return data
 
 
 

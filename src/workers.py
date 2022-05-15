@@ -49,7 +49,7 @@ class create_worker():
         print(f.read())
         f.close()
 
-
+### Obsolete
 def create_attributes():
     # This will be randomized in the future based on something
     attributes = {}
@@ -66,12 +66,23 @@ def create_attributes():
 
 
 
+# This is a utility class to create object within this module instead of utility module
+class worker_object:
+    def __init__(self, data):
+        #create an object in worker module
+        for attr in data:
+        
+            # Add attributes to object
+            setattr(self, attr[0], attr[1])
+
+
+
 ## Creates worker objects where the files were used before
 def create_worker_from_configures():
     path = os.path.join(os.path.dirname(__file__), "resources")
     conf = open(os.path.join(path, "workers.conf"), "r")
 
-    # ALl settlements in the file
+    # All workers in the file
     workers = []
 
     # set attributes to object based on the file
@@ -81,9 +92,11 @@ def create_worker_from_configures():
         if not worker:
             break
 
-        # Create object from settlement data
-        obj = utils.conf_data_to_object(worker)
+        # Create object from worker data using "worker_object" class
+        data = utils.conf_data_to_attribute_list(worker)
+        obj = worker_object(data)
         workers.append(obj)
+
     return workers
 
 

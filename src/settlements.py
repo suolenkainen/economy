@@ -49,7 +49,7 @@ class create_settlement():
         print(f.read())
         f.close()
 
-
+### Obsolete
 def create_attributes():
 
     # This will be randomized in the future based on something
@@ -70,8 +70,19 @@ def create_attributes():
 
 
 
-## Creates settlement objects where the files were used before
-def create_settlement_from_configures():
+# This is a utility class to create object within this module instead of utility module
+class settlement_object:
+    def __init__(self, data):
+        #create an object in settlement module
+        for attr in data:
+        
+            # Add attributes to object
+            setattr(self, attr[0], attr[1])
+
+
+
+## Creates settlements objects where the files were used before
+def create_settlements_from_configures():
     path = os.path.join(os.path.dirname(__file__), "resources")
     conf = open(os.path.join(path, "settlements.conf"), "r")
 
@@ -85,9 +96,11 @@ def create_settlement_from_configures():
         if not settlement:
             break
 
-        # Create object from settlement data
-        obj = utils.conf_data_to_object(settlement)
+        # Create object from settlement data using "settlement_object" class
+        data = utils.conf_data_to_attribute_list(settlement)
+        obj = settlement_object(data)
         settlements.append(obj)
+
     return settlements
 
 
@@ -112,5 +125,6 @@ if __name__ == '__main__':
     # for i in range(settlement_amount):
     #     attributes["index"] = i
     #     create_settlement(attributes)
-    settl_objects = create_settlement_from_configures()
+
+    settl_objects = create_settlements_from_configures()
     print(settl_objects)
