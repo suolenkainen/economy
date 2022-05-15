@@ -5,7 +5,9 @@ I wanted to create a simulation that simulates how economy works. I thought that
 I chose python as a language for this because I'm most familiar with it. I also used pygame-module to visualize the effort of hauling stuff between villages, etc.
 
 ## Approach
-I create files that are the basis of the program. There are files for settlement, workers (people actually working, not just villagers), goods (the item being delivered) and producers (places that produce goods). These are then manipulated to perform the functions.
+| I create files that are the basis of the program. There are files for settlement, workers (people actually working, not just villagers), goods (the item being delivered) and producers (places that produce goods). These are then manipulated to perform the functions.
+
+I changed my approach just using objects instead of file system. Even thought testability was in mind with the files, that can be circumvented by havin a configuration file instead. Configuration file now consists of lines representing an item (settlement, worker, etc.) and these lines are then converted into objects. In the future maybe there will be a json, yaml, or similar config file, but a text file will do for now.
 
 A _settlement_ is basically any settlement that has people living in it. This can be a farming complex, a mine, a village with 20 people in it, or a mighty city with tens of bakeries, coopers, etc. These settlement have various goods that are consumed by production places and villagers. Some settlements irregularly require some luxury items (jewlwery, meat, clothes, etc.) that are only requiested for a brief time. Most usual settlements are the following:
 - Farming settlement with 5 inhabitants (produces _grain_)
@@ -25,11 +27,14 @@ Currently I'm trying to create a MVP for a farm to deliver grain to a town.
 
 Utilities now contain common elements of each function that would be duplicate code for the function. This contains "file to object" and "attributes to text".
 
+Running the script can now perform a calculation where it attaches workers to work assignments, etc. The work is still to be done on how to finish the delivery process. Also, extensive testing needs to be done since a lot has been developed "in rush to get an MVP done". Now that there is somewhat functioning MVP, testing can really commence.
+
 ## Future plans
 - Some randomness might be introduced to production rates, etc.
 - A _path_ file will be crated between two settlemens which can the be used by workers. The condition can increase or decrease based on use.
 - When there are crossing between delivery paths, a new town may form.
 - Worker cash reserve (maybe loaning from settlements)
+- New settlements created using a template (farm, etc.)
 
 ## Testing
 Testing is done using *unittest*. TBD.

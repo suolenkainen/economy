@@ -35,6 +35,34 @@ class file_to_object:
             setattr(self, attr[0], attr[1])
 
 
+
+# Temprary tool
+class settlement_to_object:
+    def __init__(self, line):
+
+        # split the data row into text form attributes
+        stlm_data = line.strip().split(",")
+        
+        # For each attribute in the line, divide it into parameteds and add them to object as object attributes
+        for stlm in stlm_data:
+            attr = stlm.strip().split("=")
+            try:
+                attr[1] = int(attr[1])
+            except:
+                try:
+                    attr[1] = float(attr[1])
+                except:
+                    pass
+
+            # For dicts and lists, use literal eval to transform string into appropriate data type
+            if attr[0] in ["marketsell", "marketbuy", "goods", "producers", "workers"]:
+                attr[1] = ast.literal_eval(attr[1])
+            
+            # Add attributes to object
+            setattr(self, attr[0], attr[1])
+
+
+
 def attributes_to_text(attrs):
     text = []
     for key in attrs:

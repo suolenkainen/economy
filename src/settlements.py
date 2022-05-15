@@ -7,7 +7,7 @@
 ## It makes .slm file to a folder "settlements" and includes all relevant information
 ## These files are then read by the main loop and added to the simulation
 
-import os
+import os, ast
 import utilities as utils
 
 """ 
@@ -69,23 +69,48 @@ def create_attributes():
     return attributes
 
 
+
+## Creates settlement objects where the files were used before
+def create_settlement_from_configures():
+    path = os.path.join(os.path.dirname(__file__), "resources")
+    conf = open(os.path.join(path, "settlements.conf"), "r")
+
+    # ALl settlements in the file
+    settlements = []
+
+    # set attributes to object based on the file
+    while True:
+        
+        settlement = conf.readline()
+        if not settlement:
+            break
+
+        # Create object from settlement data
+        obj = utils.settlement_to_object(settlement)
+        settlements.append(obj)
+    return settlements
+
+
+
 if __name__ == '__main__':
         
-    # Test settlement creation attributes
-    settlement_amount = 1
-    settlements = os.listdir(path)
+    # # Test settlement creation attributes
+    # settlement_amount = 1
+    # settlements = os.listdir(path)
 
-    # Before creating new files, the old directory needs to be emptied
-    class clear_settlements:
-        for s in settlements:
-            if postfix in s:
-                os.remove(os.path.join(path, s))
+    # # Before creating new files, the old directory needs to be emptied
+    # class clear_settlements:
+    #     for s in settlements:
+    #         if postfix in s:
+    #             os.remove(os.path.join(path, s))
 
-    print("main")
+    # print("main")
 
-    attributes = create_attributes()
+    # attributes = create_attributes()
 
 
-    for i in range(settlement_amount):
-        attributes["index"] = i
-        create_settlement(attributes)
+    # for i in range(settlement_amount):
+    #     attributes["index"] = i
+    #     create_settlement(attributes)
+    settl_objects = create_settlement_from_configures()
+    print(settl_objects)
