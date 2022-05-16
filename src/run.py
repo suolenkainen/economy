@@ -21,6 +21,7 @@ workorder_last_id = 2
 sett_objects = []
 wrk_objects = []
 ord_objects = []
+tickcount = 0
 
 # Generate objects from configuration files
 sett_objects = sett.create_settlements_from_configures()
@@ -49,6 +50,15 @@ def combine_workorders():
     order = 0
     while True: 
         sold = selling[order]
+        if sold.processed == "sold":
+            complete_orders.append(sold)
+            order += 1
+            if order >= len(selling):
+                buying.extend(selling)
+                break
+            continue
+        if buying == []:
+            deal = False
         for request in buying:
             deal = False
             
@@ -62,6 +72,7 @@ def combine_workorders():
         #when deal is formed, the deal is put into a list of completed transactions. If some of the goods are not sold or remaining in the order, a new order is created
         if deal:
             complete_order, newsall, newbuy = utils.combine_workorders(sold, request)
+            ord_objects.remove(request)
             complete_orders.append(complete_order)
             buying.remove(request)
             buying.extend(newbuy)
@@ -80,7 +91,6 @@ def combine_workorders():
             buying.extend(selling)
             break
 
-    print(complete_orders)
     return complete_orders, buying
 
 
@@ -90,6 +100,8 @@ def transactions_distance(transactions):
 
     # loop through workorders and find the settlements 
     for order in transactions:
+        if order.destination == -1:
+            continue
         ord_settlement1 = order.owner
         for stlm1 in sett_objects:
             if stlm1.id == ord_settlement1:
@@ -133,7 +145,7 @@ def reserving_transaction_to_worker(transactions):
     for order in transactions:
 
         # Only reserve orders that already don't have a worker assigned
-        if order.reserved != -1:
+        if order.reserved != -1 or order.worker != -1:
             continue
         
         # Workers will be sorted and eventually closest will be chosen
@@ -168,8 +180,7 @@ def reserving_transaction_to_worker(transactions):
 def begin_transaction(transactions):
     for order in transactions:
 
-        # Only reserve orders that already don't have a worker assigned
-        if order.reserved == -1 or order.worker == -1:
+        if order.processed in ["sold", "paid"]:
             continue
 
         # Find correct settlement info
@@ -179,8 +190,8 @@ def begin_transaction(transactions):
 
                 # Seller get's paid for the transaction and pays taxes and fees
                 price = order.amount * order.price
-                seller.liquid_wealth += price
-                seller.liquid_wealth -= price*0.1
+                seller.liquidwealth += price
+                seller.liquidwealth -= price*0.1
 
                 # Remove goods from settlement
                 try:
@@ -188,6 +199,8 @@ def begin_transaction(transactions):
                 except:
                     seller.goods[order.product] = 0
                 seller.goods[order.product] -= order.amount
+
+                order.processed = "sold"
 
 
 
@@ -205,7 +218,7 @@ def worker_owning_transaction(transactions):
 
         # Find all workers not moving
         for worker in wrk_objects:
-            
+
             # Find destination settlement
             destination = utils.endpoint_calculator([worker], sett_objects, "settlementid")
 
@@ -218,26 +231,64 @@ def worker_owning_transaction(transactions):
                 worker.distance = order.distance
                 worker.speed = worker.maxspeed
                 order.worker = worker.id
+                order.reserved = -1
+                break
 
 
 
 ## Move workers towards the destionation and make a list of finished journeys. This includer journeys to transaction starts
-def worker_journey(transactions):
+def worker_journey():
     
     # Find all workers with workorders
-    finished_journeys = []
+    finished_orders = []
     for w in wrk_objects:
         if w.speed != 0 and w.distance != 0:
                 w.progression += w.speed
                 if w.progression >= w.distance:
-                    finished_journeys.append(w.id)
+                    finished_orders.extend(w.workorders)
+                    w.distance = 0
+                    w.progression = 0
+                    w.speed = 0
                     print("DONE")
 
-    return finished_journeys
+    return finished_orders
 
 
 
 ## On completing the journey, charge the settlement for goods and taxes and add them to settlement's goods
+def end_transactions(finished_orders, transactions):
+    
+    # Check which transactions have been ended
+    for o_id in finished_orders:
+        for t in transactions:
+            if t.id == o_id:
+                transaction = t
+                break
+        
+        # connect transaction to the buyer's settlement
+        for s in sett_objects:
+            if transaction.destination == s.id:
+                buyer = s
+                break
+        
+        # Charge the buyer town accordingly
+        price = transaction.amount * transaction.price
+        buyer.liquidwealth -= price
+        buyer.liquidwealth -= price*0.1
+
+        # Add goods to their supply
+        try:
+            x = buyer.goods[transaction.product]
+        except:
+            buyer.goods[transaction.product] = 0
+        buyer.goods[transaction.product] += transaction.amount
+
+        # Remove transaction
+        transactions.remove(transaction)
+        ord_objects.remove(transaction)
+
+    return transactions
+
 
 
 """
@@ -251,7 +302,7 @@ def main():
 
     while running:
         # keep loop running at the right speed
-        clock.tick(5)
+        clock.tick(10)
 
         # Process input (events)
         for event in pygame.event.get():
@@ -265,7 +316,7 @@ def main():
         for s in sett_objects:
             x = int(s.coordx)
             y = int(s.coordy)
-            pygame.draw.rect(screen, (0,0,0), (x, y, 5, 5))
+            pygame.draw.rect(screen, (0,0,0), (x, y, 10, 10))
 
             # Make the display and settlements larger and add text next to them representing the workorders. 
             # Mark the workorders in other color if made into transactions
@@ -273,21 +324,31 @@ def main():
 
         ## Work orders are created by demand of a production place or a settlement population
         ## A production place always aims to have their resource storage filled and goods emptied
-        ## If there isn't enough suppliers for a resource, the production place boosts up their buy market price
-        ## If there is more than the capacity of resource storage being offered, production lowers market price
-        ## If there is more demand than the supplier can produce, the sell price goes up
-        ## If there isn't enough buyer for a good, the production place lowers their sell price
-        ## All price modifications are calculated based on the surplus/lack of products -> Utilities
         ## The work orders are always attached to a settlement instead of the production place
         ## If there is no items not for sell at the requested price, the settlement will pay for maximum of 5% increase from the cheapest
         ## Settlement always buys from the cheapest supplier
 
         transactions, incomplete = combine_workorders()
-        transactions_distance(transactions)
-        adjust_settlement_markets(incomplete)
+
+
 
         ## If there is a requirement in some settlement for some resource and there is room in storage, check if there is workorder in near by settlement
         ## Order workers based on the closest settlement.
+
+        transactions_distance(transactions)
+
+
+
+        ## If there isn't enough suppliers for a resource, the production place boosts up their buy market price
+        ## If there is more than the capacity of resource storage being offered, production lowers market price
+        ## If there is more demand than the supplier can produce, the sell price goes up
+        ## If there isn't enough buyer for a good, the production place lowers their sell price
+        ## All price modifications are calculated based on the surplus/lack of products -> Utilities
+        
+        adjust_settlement_markets(incomplete)
+
+
+
         ## If not the current settlement, travel to nearest settlement. If a workorder is larger than capacity of the worker, the workorder can be split into smaller pieces
         ## A workorder can be reserved for that worker
         ## Same worker can do two workorders from same starting place to same destination if there is capacity and enough workorders
@@ -296,44 +357,27 @@ def main():
         worker_owning_transaction(transactions)
         begin_transaction(transactions)
 
+
+
+        ## In addition to workers making a purchase journey, they can move to a work order settlement
+        ## start moving workers to destinations based on their work order.
+
+        # def worker_towards_ workorder():
+        #   pass
+
+
+
         ## Worker walks until at destination
-        finished_journeys = worker_journey(transactions)
-        if finished_journeys != []:
-            # handle the finished orders
-            print(123)
-            begin_transaction(transactions)
-        for w in wrk_objects:
-            if w == 0:
-                pass
-
-        # def create_list_of_work_orders():
-        #     pass
-        #     return list_of_work_orders
+        finished_orders = worker_journey()
 
 
-        # for activeworker in wrk_objects:
-        #     def search_for_nearest_requirement():
-        #         pass
-        #         return list of workers sorted by closeness to some requirement
-
-        # for closest_worker_to_resource in wrk_objects:
-        #     if list_of_work_orders is reserved, then redo calculation for that worker and sort to correct place
-        #     remove payment amount from city and 
-        #     end result is attaching all workers to work orders.
-
-
-
-        ## Start moving workers to destinations based on their work order.
-        ## The work order always costs to a settlement 10% of the selling fee and for purchase fee
-        ## The goods are then attached to that settlement and distributed between production placed by percentage of need
-
-        # def move_workers_towards_destination():
-        #     pass
-        #     check if arrived
         
-        # def unload_goods_to_settlement():
-        #     receive payment
+        ## The work order always costs to a settlement 10% of the selling fee and for purchase fee
+        ## The goods are then attached to that settlement and distributed between production placed by percentage of nee
+        if finished_orders != []:
+            transactions = end_transactions(finished_orders, transactions)
 
+        
 
 
         ## Resource goods are depleted from settlements by producers

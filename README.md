@@ -23,9 +23,7 @@ _Work orders_ are assignments that the workers take to move things around. Each 
 A _producer_ is a place that creates goods from either producing gathering, hunting, mining, etc. them or refining new goods based on existing ones.
 
 ## Stage
-Currently I'm trying to create a MVP for a farm to deliver grain to a town.
-
-Utilities now contain common elements of each function that would be duplicate code for the function. This contains "file to object" and "attributes to text".
+A worker can now be attached to a work order and deliver it to the correct place. This has been a Proof of concept and found to be working. The code is quite complex and with testing it can be eventually refactored.
 
 Running the script can now perform a calculation where it attaches workers to work assignments, etc. The work is still to be done on how to finish the delivery process. Also, extensive testing needs to be done since a lot has been developed "in rush to get an MVP done". Now that there is somewhat functioning MVP, testing can really commence.
 
