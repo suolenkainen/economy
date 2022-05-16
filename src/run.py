@@ -98,6 +98,9 @@ def transactions_distance(transactions):
         for stlm2 in sett_objects:
             if stlm2.id == ord_settlement2:
                 destination = stlm2
+
+        # starting_t, destination_t = utils.endpoint_calculator(transactions, sett_objects)
+        # print("transactions_distance", starting_t, destination_t)
     
         # send the settlement info to distance calculator
         order.distance = utils.distance_calculator(starting, destination)
@@ -111,7 +114,7 @@ def adjust_settlement_markets(workorders):
     for order in workorders:
         ord_settlement = order.owner
         for stlm in sett_objects:
-            if stlm.name == ord_settlement:
+            if stlm.id == ord_settlement:
 
                 # Adjust the market price for that product in that settlement
                 if order.product in stlm.marketsell and order.sell == True:
@@ -136,32 +139,27 @@ def reserving_transaction_to_worker(transactions):
         # Workers will be sorted and eventually closest will be chosen
         sorted_workers = []
 
-        # Find correct settlement info
-        ord_settlement = order.owner
-        for stlm1 in sett_objects:
-            if stlm1.id == ord_settlement:
-                starting = stlm1
-                break
+        # Find starting settlement
+        starting = utils.endpoint_calculator(transactions, sett_objects, "owner")
 
         # Find all workers not moving
         for worker in wrk_objects:
             if worker.speed != 0:
                 continue
-            wrk_settlement = worker.settlementid
-            for stlm2 in sett_objects:
-                if stlm2.id == wrk_settlement:
-                    destination = stlm2
-                    break
+
+            # Find destination settlement
+            destination = utils.endpoint_calculator([worker], sett_objects, "settlementid")
 
             # send the settlement info to distance calculator
             worker.distance = utils.distance_calculator(starting, destination)
             sorted_workers.append(worker)
-            sorted_workers = sorted(sorted_workers, key=lambda d: d.distance)
+            
+        sorted_workers = sorted(sorted_workers, key=lambda d: d.distance)
         
         # Attach the worker to the attributes in the transaction
-        order.reserved = sorted_workers[0].name
+        order.reserved = sorted_workers[0].id
 
-        # Attach the transaction to worker's list (currently filename but later some other identifier)
+        # Attach the transaction to worker's list
         sorted_workers[0].workorders.append(order.id)
 
 
@@ -202,22 +200,14 @@ def worker_owning_transaction(transactions):
         if order.reserved == -1:
             continue
 
-        # Find correct settlement info
-        ord_settlement = order.owner
-        for stlm1 in sett_objects:
-            if stlm1.id == ord_settlement:
-                starting = stlm1
-                break
+        # Find starting settlement
+        starting = utils.endpoint_calculator(transactions, sett_objects, "owner")
 
         # Find all workers not moving
         for worker in wrk_objects:
-            if worker.speed != 0:
-                continue
-            wrk_settlement = worker.settlementid
-            for stlm2 in sett_objects:
-                if stlm2.id == wrk_settlement:
-                    destination = stlm2
-                    break
+            
+            # Find destination settlement
+            destination = utils.endpoint_calculator([worker], sett_objects, "settlementid")
 
             # send the settlement info to distance calculator
             worker.distance = utils.distance_calculator(starting, destination)
@@ -230,22 +220,19 @@ def worker_owning_transaction(transactions):
                 order.worker = worker.id
 
 
+
 ## Move workers towards the destionation and make a list of finished journeys. This includer journeys to transaction starts
 def worker_journey(transactions):
     
     # Find all workers with workorders
     finished_journeys = []
     for w in wrk_objects:
-        for ord in transactions:
-            if ord.id in w.workorders:
-                for stlm in sett_objects:
-                    if stlm.id == ord.destination:
-                        # Move worker with their maximum speed towards destination 
-                        w.progression += w.speed
-                        if w.progression >= w.distance:
-                            finished_journeys.append(w.id)
-                            print("DONE")
-                
+        if w.speed != 0 and w.distance != 0:
+                w.progression += w.speed
+                if w.progression >= w.distance:
+                    finished_journeys.append(w.id)
+                    print("DONE")
+
     return finished_journeys
 
 

@@ -6,34 +6,7 @@
 ## Functions that are commonly used in modules.
 
 from math import sqrt
-import os, ast
-
-
-## Obsolete
-# Function is used to return an object based on the attributes in the file
-class file_to_object:
-    def __init__(self, filename, path):
-        stlm = open(os.path.join(path, filename), "r")
-        self.filename = filename
-
-        # set attributes to object based on the file
-        while True:
-            
-            line = stlm.readline()
-            if not line:
-                break
-            attr = line.strip().split("=")
-            try:
-                attr[1] = int(attr[1])
-            except:
-                pass
-            try:
-                attr[1] = float(attr[1])
-            except:
-                pass
-            if attr[0] in ["marketsell", "marketbuy", "goods", "producers", "resourcegoods", "workers", "sell", "workorders", "sell"]:
-                attr[1] = ast.literal_eval(attr[1])
-            setattr(self, attr[0], attr[1])
+import ast
 
 
 
@@ -64,15 +37,6 @@ def conf_data_to_attribute_list(line):
 
 
 
-def attributes_to_text(attrs):
-    text = []
-    for key in attrs:
-        # print(key, attrs[key])
-        text.append(key + "=" + str(attrs[key]) + "\n")
-    print(text)
-    return text
-
-
 def combine_workorders(seller, buyer):
     # If workorders match each other, the seller order is updated and buy-order is removed
     if seller.amount == buyer.amount:
@@ -96,6 +60,7 @@ def combine_workorders(seller, buyer):
 
 # This function checks if a transaction forms a deal
 def sales_calculator(asked, payed):
+
     deal = False
             
     #Checking that transaction is made within range of reason (5%)
@@ -116,6 +81,7 @@ def sales_calculator(asked, payed):
     return deal
 
 
+
 # Distance between two settlements
 def distance_calculator(a, b):
     xa = a.coordx
@@ -130,16 +96,39 @@ def distance_calculator(a, b):
     return d
 
 
+# #  , transactions = [], sett_objects = [], params = ("owner", "destination")
+# def endpoint_calculator1(transactions, sett_objects):
+#     for order in transactions:
+#         ord_settlement = order.owner
+#         for stlm1 in sett_objects:
+#             if stlm1.id == ord_settlement:
+#                 starting = stlm1
+#                 break
+
+#     for worker in wrk_objects:
+#         if worker.speed != 0:
+#             continue
+#         wrk_settlement = worker.settlementid
+#         for stlm2 in sett_objects:
+#             if stlm2.id == wrk_settlement:
+#                 destination = stlm2
+#                 break
+
+#     return starting.__dict__, destination.__dict__
+
+#  , transactions = [], sett_objects = [], params = ("owner", "destination")
+def endpoint_calculator(searched_objects, sett_objects, param):
+
+    # calculate 
+    for s_obj in searched_objects:
+        s_var = s_obj.__dict__[param]
+        for d_var in sett_objects:
+            if d_var.id == s_var:
+                settlement = d_var
+                break
+
+    return settlement
+
+
 if __name__ == "__main__":
-
-    attributes = {}
-    attributes["type"] = "hauling"
-    attributes["destination"] = "settlement_1"
-    attributes["speed"] = 0
-    attributes["maxspeed"] = 5
-    attributes["distance"] = 0
-    attributes["progression"] = 0
-    attributes["goods"] = []
-    attributes["capacity"] = 100
-
-    print(attributes_to_text(attributes))
+    pass
