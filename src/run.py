@@ -16,51 +16,16 @@ worker_last_id = 1
 producer_last_id = 1
 workorder_last_id = 2
 
-for i in range(1):
-    attr = sett.create_attributes()
-    attr["index"] = i
-    sett.create_settlement(attr)
-
-# Path to "settlements" folder and list of settlement names
-settlement_path = "resources\\settlements"
-setpath = os.path.join(os.path.dirname(__file__), settlement_path)
-sett_files = os.listdir(setpath)
-
-# Path to "workers" folder and list of worker names
-worker_path = "resources\\workers"
-wrkpath = os.path.join(os.path.dirname(__file__), worker_path)
-work_files = os.listdir(wrkpath)
-
-# Path to "workorder" folder and list of workorder names
-workorder_path = "resources\\workorders"
-ordpath = os.path.join(os.path.dirname(__file__), workorder_path)
-workorder_files = os.listdir(ordpath)
 
 # A group of settlement objects
-settlement_list = []
-worker_list = []
-existing_workorder_list = []
+sett_objects = []
+wrk_objects = []
+ord_objects = []
 
-# Generate objects from the settlement files
-for s in sett_files:
-    settlement_obj = utils.file_to_object(s, setpath)
-    settlement_list.append(settlement_obj)
-
+# Generate objects from configuration files
 sett_objects = sett.create_settlements_from_configures()
-
-
-for w in work_files:
-    workr_obj = utils.file_to_object(w, wrkpath)
-    worker_list.append(workr_obj)
-
 wrk_objects = wrk.create_worker_from_configures()
-
-for o in workorder_files:
-    workorder_obj = utils.file_to_object(o, ordpath)
-    existing_workorder_list.append(workorder_obj)
-
 ord_objects = ord.create_workorders_from_configures()
-
 prod_objects = pro.create_producers_from_configures()
 
 
@@ -72,7 +37,7 @@ def combine_workorders():
     complete_orders = []
 
     # Divide the selling and buying into their of lists and sort them continuously
-    for order in existing_workorder_list:
+    for order in ord_objects:
         if order.sell == True:
             selling.append(order)
         else:
@@ -126,12 +91,12 @@ def transactions_distance(transactions):
     # loop through workorders and find the settlements 
     for order in transactions:
         ord_settlement1 = order.owner
-        for stlm1 in settlement_list:
-            if stlm1.name == ord_settlement1:
+        for stlm1 in sett_objects:
+            if stlm1.id == ord_settlement1:
                 starting = stlm1
         ord_settlement2 = order.destination
-        for stlm2 in settlement_list:
-            if stlm2.name == ord_settlement2:
+        for stlm2 in sett_objects:
+            if stlm2.id == ord_settlement2:
                 destination = stlm2
     
         # send the settlement info to distance calculator
@@ -145,7 +110,7 @@ def adjust_settlement_markets(workorders):
     # loop through workorders and combine them with settlements
     for order in workorders:
         ord_settlement = order.owner
-        for stlm in settlement_list:
+        for stlm in sett_objects:
             if stlm.name == ord_settlement:
 
                 # Adjust the market price for that product in that settlement
@@ -165,7 +130,7 @@ def reserving_transaction_to_worker(transactions):
     for order in transactions:
 
         # Only reserve orders that already don't have a worker assigned
-        if order.reserved != "":
+        if order.reserved != -1:
             continue
         
         # Workers will be sorted and eventually closest will be chosen
@@ -173,18 +138,18 @@ def reserving_transaction_to_worker(transactions):
 
         # Find correct settlement info
         ord_settlement = order.owner
-        for stlm1 in settlement_list:
-            if stlm1.name == ord_settlement:
+        for stlm1 in sett_objects:
+            if stlm1.id == ord_settlement:
                 starting = stlm1
                 break
 
         # Find all workers not moving
-        for worker in worker_list:
+        for worker in wrk_objects:
             if worker.speed != 0:
                 continue
-            wrk_settlement = worker.settlement
-            for stlm2 in settlement_list:
-                if stlm2.name == wrk_settlement:
+            wrk_settlement = worker.settlementid
+            for stlm2 in sett_objects:
+                if stlm2.id == wrk_settlement:
                     destination = stlm2
                     break
 
@@ -197,7 +162,7 @@ def reserving_transaction_to_worker(transactions):
         order.reserved = sorted_workers[0].name
 
         # Attach the transaction to worker's list (currently filename but later some other identifier)
-        sorted_workers[0].workorders.append(order.filename)
+        sorted_workers[0].workorders.append(order.id)
 
 
 
@@ -206,13 +171,13 @@ def begin_transaction(transactions):
     for order in transactions:
 
         # Only reserve orders that already don't have a worker assigned
-        if order.reserved == "" or order.worker == "":
+        if order.reserved == -1 or order.worker == -1:
             continue
 
         # Find correct settlement info
         seller_stlm = order.owner
-        for seller in settlement_list:
-            if seller.name == seller_stlm:
+        for seller in sett_objects:
+            if seller.id == seller_stlm:
 
                 # Seller get's paid for the transaction and pays taxes and fees
                 price = order.amount * order.price
@@ -234,23 +199,23 @@ def worker_owning_transaction(transactions):
     for order in transactions:
 
         # Only reserve orders that already don't have a worker assigned
-        if order.reserved == "":
+        if order.reserved == -1:
             continue
 
         # Find correct settlement info
         ord_settlement = order.owner
-        for stlm1 in settlement_list:
-            if stlm1.name == ord_settlement:
+        for stlm1 in sett_objects:
+            if stlm1.id == ord_settlement:
                 starting = stlm1
                 break
 
         # Find all workers not moving
-        for worker in worker_list:
+        for worker in wrk_objects:
             if worker.speed != 0:
                 continue
-            wrk_settlement = worker.settlement
-            for stlm2 in settlement_list:
-                if stlm2.name == wrk_settlement:
+            wrk_settlement = worker.settlementid
+            for stlm2 in sett_objects:
+                if stlm2.id == wrk_settlement:
                     destination = stlm2
                     break
 
@@ -262,7 +227,7 @@ def worker_owning_transaction(transactions):
                 worker.settlement = order.destination
                 worker.distance = order.distance
                 worker.speed = worker.maxspeed
-                order.worker = worker.name
+                order.worker = worker.id
 
 
 ## Move workers towards the destionation and make a list of finished journeys. This includer journeys to transaction starts
@@ -270,16 +235,15 @@ def worker_journey(transactions):
     
     # Find all workers with workorders
     finished_journeys = []
-    for w in worker_list:
+    for w in wrk_objects:
         for ord in transactions:
-            if  ord.filename in w.workorders:
-                for stlm in settlement_list:
-                    if stlm.name == ord.destination:
+            if ord.id in w.workorders:
+                for stlm in sett_objects:
+                    if stlm.id == ord.destination:
                         # Move worker with their maximum speed towards destination 
-                        speed = w.maxspeed
-                        w.progression += speed
+                        w.progression += w.speed
                         if w.progression >= w.distance:
-                            finished_journeys.append(w.filename)
+                            finished_journeys.append(w.id)
                             print("DONE")
                 
     return finished_journeys
@@ -311,9 +275,9 @@ def main():
         screen.fill((255, 255, 255))
 
         # Draw all settlements to screen
-        for s in settlement_list:
-            x = int(s.coordinate_X)
-            y = int(s.coordinate_Y)
+        for s in sett_objects:
+            x = int(s.coordx)
+            y = int(s.coordy)
             pygame.draw.rect(screen, (0,0,0), (x, y, 5, 5))
 
             # Make the display and settlements larger and add text next to them representing the workorders. 
@@ -350,7 +314,8 @@ def main():
         if finished_journeys != []:
             # handle the finished orders
             print(123)
-        for w in worker_list:
+            begin_transaction(transactions)
+        for w in wrk_objects:
             if w == 0:
                 pass
 
@@ -359,12 +324,12 @@ def main():
         #     return list_of_work_orders
 
 
-        # for activeworker in worker_list:
+        # for activeworker in wrk_objects:
         #     def search_for_nearest_requirement():
         #         pass
         #         return list of workers sorted by closeness to some requirement
 
-        # for closest_worker_to_resource in worker_list:
+        # for closest_worker_to_resource in wrk_objects:
         #     if list_of_work_orders is reserved, then redo calculation for that worker and sort to correct place
         #     remove payment amount from city and 
         #     end result is attaching all workers to work orders.
@@ -406,7 +371,7 @@ def main():
 
 
 pygame.init()
-screen = pygame.display.set_mode((200, 200))
+screen = pygame.display.set_mode((1000, 600))
 pygame.display.set_caption("Economy simulator")
 clock = pygame.time.Clock()
 

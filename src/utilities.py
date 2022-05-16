@@ -31,7 +31,7 @@ class file_to_object:
                 attr[1] = float(attr[1])
             except:
                 pass
-            if attr[0] in ["marketsell", "marketbuy", "goods", "producers", "resourcegoods", "workers", "sell", "workorders"]:
+            if attr[0] in ["marketsell", "marketbuy", "goods", "producers", "resourcegoods", "workers", "sell", "workorders", "sell"]:
                 attr[1] = ast.literal_eval(attr[1])
             setattr(self, attr[0], attr[1])
 
@@ -55,7 +55,7 @@ def conf_data_to_attribute_list(line):
                 pass
 
         # For dicts and lists, use literal eval to transform string into appropriate data type
-        if attr[0] in ["marketsell", "marketbuy", "goods", "producers", "workers", "workorders", "requirements"]:
+        if attr[0] in ["marketsell", "marketbuy", "goods", "producers", "workers", "workorders", "requirements", "sell"]:
             attr[1] = ast.literal_eval(attr[1])
         
         data[i] = attr
@@ -118,10 +118,10 @@ def sales_calculator(asked, payed):
 
 # Distance between two settlements
 def distance_calculator(a, b):
-    xa = a.coordinate_X
-    ya = a.coordinate_Y
-    xb = b.coordinate_X
-    yb = b.coordinate_Y
+    xa = a.coordx
+    ya = a.coordy
+    xb = b.coordx
+    yb = b.coordy
 
     x = abs(xa-xb)
     y = abs(ya-yb)
