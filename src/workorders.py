@@ -8,7 +8,7 @@
 ## These files are then read by the main loop and added to the simulation
 
 import os
-import utilities as utils
+from src.utilities import conf_data_to_attribute_list
 
 """ 
 Required attributes
@@ -24,47 +24,7 @@ Required attributes
 
 
 # workorder file properties
-workorder_path = "resources\\workorders"
-path = os.path.join(os.path.dirname(__file__), workorder_path)
-postfix = "workorder_"
-prefix = ".ord"
-
-
-class create_workorder:
-    def __init__(self, attributes):
-
-        # Write attributes into .gds file
-
-        # Create text from attributes
-        text = utils.attributes_to_text(attributes)
-
-        # Create a file with a filename generate
-        filename = postfix + str(attributes["index"]) + prefix
-        f = open(os.path.join(path, filename), "w")
-        f.writelines(text)
-
-        # Test that file exists with proper data
-        f = open(os.path.join(path, filename), "r")
-        print(f.read())
-        f.close()
-
-
-### Obsolete
-def create_attributes():
-    # This will be randomized in the future based on something
-    attributes = {}
-    attributes["owner"] = "settlement_0"
-    attributes["destination"] = ""
-    attributes["sell"] = True
-    attributes["product"] = "grain"
-    attributes["method"] = ""
-    attributes["worker"] = ""
-    attributes["reserved"] = ""
-    attributes["price"] = 12.00
-    attributes["amount"] = 5
-    attributes["capacityperitem"] = 1
-    attributes["distance"] = 0
-    return attributes
+path = os.path.join(os.path.dirname(__file__), "resources")
 
 
 
@@ -79,23 +39,40 @@ class workorder_object:
 
 
 
+# Fetch configuration data for the creation of work orders
+def fetch_conf_data():
+
+    # Fetch conf text
+    conf = open(os.path.join(path, "workorders.conf"), "r")
+    text = conf.readlines()
+
+    return text
+
+
+
+# Fetch attribute-list
+def attribute_list(workorder):
+    
+    list = conf_data_to_attribute_list(workorder)
+
+    return list
+
+
+
 ## Creates workorder objects where the files were used before
 def create_workorders_from_configures():
-    path = os.path.join(os.path.dirname(__file__), "resources")
-    conf = open(os.path.join(path, "workorders.conf"), "r")
+
+    # Fetch configuration data
+    lines = fetch_conf_data()
 
     # All workorders in the file
     workorders = []
 
     # set attributes to object based on the file
-    while True:
+    for workorder in lines:
         
-        workorder = conf.readline()
-        if not workorder:
-            break
-
         # Create object from workorder data using "workorder_object" class
-        data = utils.conf_data_to_attribute_list(workorder)
+        data = attribute_list(workorder)
         obj = workorder_object(data)
         workorders.append(obj)
 
@@ -105,23 +82,6 @@ def create_workorders_from_configures():
 
 if __name__ == '__main__':
     
-    #  # Test workorder creation attributes
-    # workorders_amount = 1
-    # workorders = os.listdir(path)
-
-    # # Before creating new files, the old directory needs to be emptied
-    # class clear_workorders:
-    #     for s in workorders:
-    #         if postfix in s:
-    #             os.remove(os.path.join(path, s))
-    
-    # print("main")
-
-    # attributes = create_attributes()
-
-    # for i in range(workorders_amount):
-    #     attributes["index"] = i
-    #     create_workorder(attributes)
-    
-    wrord_objects = create_workorders_from_configures()
-    print(wrord_objects)
+    ord_objects = create_workorders_from_configures()
+    for o in ord_objects:
+        print(o.__dict__)

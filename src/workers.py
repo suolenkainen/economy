@@ -23,10 +23,7 @@ Required attributes to be clarified.
 """
 
 # worker file properties
-worker_path = "resources\\workers"
-path = os.path.join(os.path.dirname(__file__), worker_path)
-postfix = "worker_"
-prefix = ".wrk"
+path = os.path.join(os.path.dirname(__file__), "resources")
 
 
 
@@ -45,11 +42,11 @@ class worker_object:
 def fetch_conf_data():
 
     # Fetch conf text
-    path = os.path.join(os.path.dirname(__file__), "resources")
     conf = open(os.path.join(path, "workers.conf"), "r")
     text = conf.readlines()
 
     return text
+
 
 
 # Fetch attribute-list
@@ -64,7 +61,7 @@ def attribute_list(worker):
 ## Creates worker objects where the files were used before
 def create_worker_from_configures():
 
-    # Fetch configuration data and linecount 
+    # Fetch configuration data
     lines = fetch_conf_data()
 
     # All workers in the file
@@ -85,4 +82,5 @@ def create_worker_from_configures():
 if __name__ == '__main__':
     
     wrkr_objects = create_worker_from_configures()
-    print(wrkr_objects)
+    for w in wrkr_objects:
+        print(w.__dict__)
