@@ -37,73 +37,27 @@ def conf_data_to_attribute_list(line):
 
 
 
-def combine_workorders(seller, buyer):
-    # If workorders match each other, the seller order is updated and buy-order is removed
-    if seller.amount == buyer.amount:
-        seller.destination = buyer.owner
-        return seller, [], []
-
-    # If seller has more than buyer is willing to buy, a new order will be created for the surplus
-    if seller.amount > buyer.amount:
-        new_order = seller
-        seller.destination = buyer.owner
-        new_order.amount -= buyer.amount
-        return seller, [new_order], []
-
-    # If buyer wants to buy more than seller has to sell, a new order will be created for the lacking amount
-    if seller.amount < buyer.amount:
-        new_order = seller
-        seller.destination = buyer.owner
-        new_order.amount -= seller.amount
-        return seller, [], [new_order]
-
-
-
-# This function checks if a transaction forms a deal
-def sales_calculator(asked, payed):
-
-    deal = False
-            
-    #Checking that transaction is made within range of reason (5%)
-    if asked > payed:
-        if asked <= payed*1.05:
-            deal = True
-        else:
-
-            # If the selling price is just a little less than required, the price is reduced a bit by seller
-            if asked/1.05 <= payed:
-                deal = True
-                asked /= 1.05
-
-    # If asked price is less than what the buyer is willing to pay, then the deal is made
-    elif asked < payed:
-        deal = True
-
-    return deal
-
-
-
-# Distance between two settlements
+# Distance and angle between two settlements
 def distance_calculator(a, b):
-    xa = a.coordx
-    ya = a.coordy
-    xb = b.coordx
-    yb = b.coordy
+    (xa, ya) = a
+    (xb, yb) = b
 
     x = abs(xa-xb)
     y = abs(ya-yb)
-    d = round(math.sqrt(x*x + y*y))
-    rad = math.atan2(yb-ya, xb-xa)
 
-    return d, rad
+    # return the distance of points and clockwise angle in rads
+    distance = round(math.sqrt(x*x + y*y))
+    rads = math.atan2(yb-ya, xb-xa)
+
+    return distance, rads
 
 
 
 # Update worker coordinates so that the marker can be drawn to the game screen
 def update_worker_coordinates(worker):
 
-    y = worker.speed * math.sin(worker.angle)
-    x = worker.speed * math.cos(worker.angle)
+    y = int(worker.speed * math.sin(worker.angle))
+    x = int(worker.speed * math.cos(worker.angle))
 
     worker.coordx += x
     worker.coordy += y
@@ -119,21 +73,11 @@ def endpoint_calculator(searched_object, sett_objects, param):
             match = d_var
             break
 
-    return match
+    return match.coordx, match.coordy
+
 
 
 if __name__ == "__main__":
-
-
-    angle = 45
-    yb = 10
-    ya = 0
-    xb = 10
-    xa = 0
-    d = 5
-    deg = math.atan2(yb-ya, xb-xa)
-
-    print(d * math.sin(deg))
-    print(d * math.cos(-deg))
+    pass
 
 
