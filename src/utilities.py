@@ -5,7 +5,7 @@
 ## utilities.py
 ## Functions that are commonly used in modules.
 
-from math import sqrt
+import math
 import ast
 
 
@@ -92,24 +92,48 @@ def distance_calculator(a, b):
 
     x = abs(xa-xb)
     y = abs(ya-yb)
-    d = round(sqrt(x*x + y*y))
+    d = round(math.sqrt(x*x + y*y))
+    rad = math.atan2(yb-ya, xb-xa)
 
-    return d
+    return d, rad
 
 
 
-def endpoint_calculator(searched_objects, sett_objects, param):
+# Update worker coordinates so that the marker can be drawn to the game screen
+def update_worker_coordinates(worker):
 
-    # calculate 
-    for s_obj in searched_objects:
-        s_var = s_obj.__dict__[param]
-        for d_var in sett_objects:
-            if d_var.id == s_var:
-                settlement = d_var
-                break
+    y = worker.speed * math.sin(worker.angle)
+    x = worker.speed * math.cos(worker.angle)
 
-    return settlement
+    worker.coordx += x
+    worker.coordy += y
+
+
+
+def endpoint_calculator(searched_object, sett_objects, param):
+
+    # Find the endpoint 
+    s_var = searched_object.__dict__[param]
+    for d_var in sett_objects:
+        if d_var.id == s_var:
+            match = d_var
+            break
+
+    return match
 
 
 if __name__ == "__main__":
-    pass
+
+
+    angle = 45
+    yb = 10
+    ya = 0
+    xb = 10
+    xa = 0
+    d = 5
+    deg = math.atan2(yb-ya, xb-xa)
+
+    print(d * math.sin(deg))
+    print(d * math.cos(-deg))
+
+

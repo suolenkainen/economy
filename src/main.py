@@ -3,6 +3,7 @@
 # https://github.com/suolenkainen/economy
 
 
+from tkinter import W
 import pygame
 import settlements as sett
 import utilities as utils
@@ -115,7 +116,7 @@ def transactions_distance(transactions):
         # print("transactions_distance", starting_t, destination_t)
     
         # send the settlement info to distance calculator
-        order.distance = utils.distance_calculator(starting, destination)
+        order.distance, order.angle = utils.distance_calculator(starting, destination)
     
 
 
@@ -152,7 +153,7 @@ def reserving_transaction_to_worker(transactions):
         sorted_workers = []
 
         # Find starting settlement
-        starting = utils.endpoint_calculator(transactions, sett_objects, "owner")
+        starting = utils.endpoint_calculator(order, sett_objects, "owner")
 
         # Find all workers not moving
         for worker in wrk_objects:
@@ -160,10 +161,10 @@ def reserving_transaction_to_worker(transactions):
                 continue
 
             # Find destination settlement
-            destination = utils.endpoint_calculator([worker], sett_objects, "settlementid")
+            destination = utils.endpoint_calculator(worker, sett_objects, "settlementid")
 
             # send the settlement info to distance calculator
-            worker.distance = utils.distance_calculator(starting, destination)
+            worker.distance, worker.angle = utils.distance_calculator(starting, destination)
             sorted_workers.append(worker)
             
         sorted_workers = sorted(sorted_workers, key=lambda d: d.distance)
@@ -206,27 +207,25 @@ def begin_transaction(transactions):
 
 ## When worker is at 0 distance to transaction start, the worker will be owning the transaction
 def worker_owning_transaction(transactions):
-        # loop through transactions and find the settlements and workers
+
+    # loop through transactions and find the settlements and workers
     for order in transactions:
 
         # Only reserve orders that already don't have a worker assigned
         if order.reserved == -1:
             continue
 
-        # Find starting settlement
-        starting = utils.endpoint_calculator(transactions, sett_objects, "owner")
-
-        # Find all workers not moving
+        # Find starting settlement and destination settlement
+        starting = utils.endpoint_calculator(order, sett_objects, "owner")
         for worker in wrk_objects:
+            destination = utils.endpoint_calculator(worker, sett_objects, "settlementid")
+            worker.distance, worker.angle = utils.distance_calculator(starting, destination)
 
-            # Find destination settlement
-            destination = utils.endpoint_calculator([worker], sett_objects, "settlementid")
-
-            # send the settlement info to distance calculator
-            worker.distance = utils.distance_calculator(starting, destination)
+            # If a worker is in the settlement, worker owns the transaction and starts journey
             if worker.distance == 0:
 
                 # Set the worker distance
+                worker.angle = order.angle
                 worker.settlement = order.destination
                 worker.distance = order.distance
                 worker.speed = worker.maxspeed
@@ -244,6 +243,7 @@ def worker_journey():
     for w in wrk_objects:
         if w.speed != 0 and w.distance != 0:
                 w.progression += w.speed
+                utils.update_worker_coordinates(w)
                 if w.progression >= w.distance:
                     finished_orders.extend(w.workorders)
                     w.distance = 0
@@ -317,6 +317,16 @@ def main():
             x = int(s.coordx)
             y = int(s.coordy)
             pygame.draw.rect(screen, (0,0,0), (x, y, 10, 10))
+            font = pygame.font.SysFont("Arial", 10)
+            img = font.render(s.name, True, (0,0,0))
+            screen.blit(img, (x + 15, y-2))
+            img = font.render("population: "+ str(s.population), True, (0,0,0))
+            screen.blit(img, (x + 15, y+12))
+            # Draw an amber dor in the settlement if there's a worker in there
+            for w in wrk_objects:
+                if w.settlementid == s.id and w.speed == 0:
+                    pygame.draw.rect(screen, (210,210,110), (w.coordx + 2, w.coordy + 2, 6, 6))
+                pygame.draw.rect(screen, (0,0,110), (w.coordx + 4, w.coordy + 4, 2, 2))
 
             # Make the display and settlements larger and add text next to them representing the workorders. 
             # Mark the workorders in other color if made into transactions
