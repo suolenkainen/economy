@@ -3,9 +3,7 @@
 # https://github.com/suolenkainen/economy
 
 ## workorder.py
-## Description of each good
-## It makes .gds file to a folder "workorder" and includes all relevant information
-## These files are then read by the main loop and added to the simulation
+## TODO: Description
 
 import os
 from src.utilities import conf_data_to_attribute_list

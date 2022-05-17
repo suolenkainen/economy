@@ -35,4 +35,4 @@ Running the script can now perform a calculation where it attaches workers to wo
 - New settlements created using a template (farm, etc.)
 
 ## Testing
-Testing is done using *unittest*. TBD.
+Testing is done using *unittest*. Tests on workers, work orders, settlements, and producers will contain tests that focus on creation of objects. Unittest "patch" is used to insert test data to the function under test. The tests are documented so that the scoped out elements are documented.
