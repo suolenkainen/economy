@@ -2,7 +2,7 @@
 # Author: Pekka Marjamäki - Suolenkainen
 # https://github.com/suolenkainen/economy
 
-import os
+
 import pygame
 import settlements as sett
 import utilities as utils

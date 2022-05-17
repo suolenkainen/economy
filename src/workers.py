@@ -8,7 +8,7 @@
 ## These files are then read by the main loop and added to the simulation
 
 import os
-import utilities as utils
+from src.utilities import conf_data_to_attribute_list
 
 """ 
 Required attributes to be clarified.
@@ -22,47 +22,11 @@ Required attributes to be clarified.
 
 """
 
-
-
 # worker file properties
 worker_path = "resources\\workers"
 path = os.path.join(os.path.dirname(__file__), worker_path)
 postfix = "worker_"
 prefix = ".wrk"
-
-
-class create_worker():
-    def __init__(self, attributes):
-
-        # Write attributes into .wrk file
-
-        # Create text from attributes
-        text = utils.attributes_to_text(attributes)
-
-        # Create a file with a filename generate
-        filename = postfix + str(attributes["index"]) + prefix
-        f = open(os.path.join(path, filename), "w")
-        f.writelines(text)
-
-        # Test that file exists with proper data
-        f = open(os.path.join(path, filename), "r")
-        print(f.read())
-        f.close()
-
-### Obsolete
-def create_attributes():
-    # This will be randomized in the future based on something
-    attributes = {}
-    attributes["type"] = "walking"
-    attributes["settlement"] = "settlement_0"
-    attributes["distance"] = 0
-    attributes["speed"] = 0
-    attributes["maxspeed"] = 5
-    attributes["progression"] = 0
-    attributes["workorders"] = []
-    attributes["capacity"] = 100
-    attributes["order"] = 0
-    return attributes
 
 
 
@@ -77,23 +41,40 @@ class worker_object:
 
 
 
-## Creates worker objects where the files were used before
-def create_worker_from_configures():
+# Fetch configuration data for the creation of workers
+def fetch_conf_data():
+
+    # Fetch conf text
     path = os.path.join(os.path.dirname(__file__), "resources")
     conf = open(os.path.join(path, "workers.conf"), "r")
+    text = conf.readlines()
+
+    return text
+
+
+# Fetch attribute-list
+def attribute_list(worker):
+    
+    list = conf_data_to_attribute_list(worker)
+
+    return list
+
+
+
+## Creates worker objects where the files were used before
+def create_worker_from_configures():
+
+    # Fetch configuration data and linecount 
+    lines = fetch_conf_data()
 
     # All workers in the file
     workers = []
 
     # set attributes to object based on the file
-    while True:
+    for worker in lines:
         
-        worker = conf.readline()
-        if not worker:
-            break
-
         # Create object from worker data using "worker_object" class
-        data = utils.conf_data_to_attribute_list(worker)
+        data = attribute_list(worker)
         obj = worker_object(data)
         workers.append(obj)
 
@@ -103,23 +84,5 @@ def create_worker_from_configures():
 
 if __name__ == '__main__':
     
-    #  # Test worker creation attributes
-    # worker_amount = 1
-    # workers = os.listdir(path)
-
-    # # Before creating new files, the old directory needs to be emptied
-    # class clear_workers:
-    #     for s in workers:
-    #         if postfix in s:
-    #             os.remove(os.path.join(path, s))
-    
-    # print("main")
-
-    # attributes = create_attributes()
-
-    # for i in range(worker_amount):
-    #     attributes["index"] = i
-    #     create_worker(attributes)
-
     wrkr_objects = create_worker_from_configures()
     print(wrkr_objects)

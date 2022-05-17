@@ -58,6 +58,7 @@ def combine_workorders(seller, buyer):
         return seller, [], [new_order]
 
 
+
 # This function checks if a transaction forms a deal
 def sales_calculator(asked, payed):
 
@@ -96,27 +97,7 @@ def distance_calculator(a, b):
     return d
 
 
-# #  , transactions = [], sett_objects = [], params = ("owner", "destination")
-# def endpoint_calculator1(transactions, sett_objects):
-#     for order in transactions:
-#         ord_settlement = order.owner
-#         for stlm1 in sett_objects:
-#             if stlm1.id == ord_settlement:
-#                 starting = stlm1
-#                 break
 
-#     for worker in wrk_objects:
-#         if worker.speed != 0:
-#             continue
-#         wrk_settlement = worker.settlementid
-#         for stlm2 in sett_objects:
-#             if stlm2.id == wrk_settlement:
-#                 destination = stlm2
-#                 break
-
-#     return starting.__dict__, destination.__dict__
-
-#  , transactions = [], sett_objects = [], params = ("owner", "destination")
 def endpoint_calculator(searched_objects, sett_objects, param):
 
     # calculate 
