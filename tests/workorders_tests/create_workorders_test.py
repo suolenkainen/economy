@@ -110,6 +110,7 @@ class Workorder_tests(unittest.TestCase):
         self.assertEqual(result_unfinished, [obj1])
 
 
+<<<<<<< HEAD
     # Testing for combining workorders with four orders combined into 2
     def test_combine_two_workorders(self,):
 
@@ -153,6 +154,16 @@ class Workorder_tests(unittest.TestCase):
         # Create a test object for comparison
         attr_dict1 = {'id': 0, 'owner': 2, 'destination': -1, 'sell': True, 'product': 'grain', 'method': '', 'worker': -1, 'reserved': -1, 'price': 12.0, 'amount': 5, 'capacityperitem': 1, 'distance': 0, 'angle': -1, 'processed': 'free'}
         attr_dict2 = {"id": 1,"owner": 1,"destination": -1,"sell": False,"product": "peas","method": "","worker": -1,"reserved": -1,"price": 11.5,"amount": 5,"capacityperitem": 1,"distance": 0,"angle": -1,"processed": "free"}
+=======
+    # Testing for combining workorders, sales and buy, where there is no sale
+    @patch('src.workorders.match_orders')
+    @patch('src.workorders.sales_calculator')
+    def test_combine_2_workorders(self, mock_sales, mock_orders):
+
+        # Create a test object for comparison
+        attr_dict1 = {'id': 0, 'owner': 2, 'destination': -1, 'sell': True, 'product': 'grain', 'method': '', 'worker': -1, 'reserved': -1, 'price': 12.0, 'amount': 5, 'capacityperitem': 1, 'distance': 0, 'angle': -1, 'processed': 'free'}
+        attr_dict2 = {"id": 1,"owner": 1,"destination": -1,"sell": False,"product": "grain","method": "","worker": -1,"reserved": -1,"price": 11.5,"amount": 5,"capacityperitem": 1,"distance": 0,"angle": -1,"processed": "free"}
+>>>>>>> ce30ade81738c31290777b6ae3fa71697e168ade
         
         class Obj(object): pass
         obj1 = Obj()
@@ -162,6 +173,12 @@ class Workorder_tests(unittest.TestCase):
         obj2 = Obj()
         for key, value in attr_dict2.items():
             setattr(obj2, key, value)
+<<<<<<< HEAD
+=======
+        # Mock return values for other functions
+        mock_sales.return_value = False
+        mock_orders.return_value = obj1, [], []
+>>>>>>> ce30ade81738c31290777b6ae3fa71697e168ade
 
         # Returns a list of of combined work orders and resulting bying orders
         ord_objects = [obj1, obj2]
