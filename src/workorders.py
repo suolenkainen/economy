@@ -148,6 +148,7 @@ def match_orders(seller, buyer):
     # If workorders match each other, the seller order is updated and buy-order is removed
     if seller.amount == buyer.amount:
         seller.destination = buyer.owner
+        seller.id += 100
         return seller, [], []
 
     # If seller has more than buyer is willing to buy, a new order will be created for the surplus
@@ -157,6 +158,7 @@ def match_orders(seller, buyer):
         seller.amount = buyer.amount
         new_order.amount -= buyer.amount
         new_order.destination = -1
+        new_order.id += 100
         return seller, [new_order], []
 
     # If buyer wants to buy more than seller has to sell, a new order will be created for the lacking amount
@@ -165,6 +167,7 @@ def match_orders(seller, buyer):
         seller.destination = buyer.owner
         new_order.amount -= seller.amount
         new_order.destination = -1
+        new_order.id += 100
         return seller, [], [new_order]
 
 

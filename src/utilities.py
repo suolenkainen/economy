@@ -56,8 +56,8 @@ def distance_calculator(a, b):
 # Update worker coordinates so that the marker can be drawn to the game screen
 def update_worker_coordinates(worker):
 
-    y = int(worker.speed * math.sin(worker.angle))
-    x = int(worker.speed * math.cos(worker.angle))
+    y = worker.speed * math.sin(worker.angle)
+    x = worker.speed * math.cos(worker.angle)
 
     worker.coordx += x
     worker.coordy += y
