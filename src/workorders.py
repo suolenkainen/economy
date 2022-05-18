@@ -134,6 +134,7 @@ def combine_workorders(ord_objects):
             order = 0
             if len(buying) == 0 or len(selling) == 0:
                 buying.extend(selling)
+                selling = []
         if len(selling) == 0 or order >= len(selling):
             buying.extend(selling)
             break
