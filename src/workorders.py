@@ -85,31 +85,18 @@ def combine_workorders(ord_objects):
     buying = []
     complete_orders = []
 
-<<<<<<< HEAD
-    # Divide the selling and buying into their of lists and sort them 
-=======
     # Divide the selling and buying into their of lists and sort them continuously
->>>>>>> ce30ade81738c31290777b6ae3fa71697e168ade
     for order in ord_objects:
         if order.sell == True:
             selling.append(order)
         else:
             buying.append(order)
-<<<<<<< HEAD
     selling = sorted(selling, key=lambda d: d.price, reverse=True)
     buying = sorted(buying, key=lambda d: d.price)
 
     # Pairing sell and purchase orders so that the most expensive item is sold first to the least paying settlement and then increasing in price
     order = 0
     while len(selling) > 0: 
-=======
-        selling = sorted(selling, key=lambda d: d.price, reverse=True)
-        buying = sorted(buying, key=lambda d: d.price)
-
-    # Pairing sell and purchase orders so that the most expensive item is sold first to the least paying settlement and then increasing in price
-    order = 0
-    while True: 
->>>>>>> ce30ade81738c31290777b6ae3fa71697e168ade
         sold = selling[order]
         if sold.processed == "sold":
             complete_orders.append(sold)
@@ -126,12 +113,9 @@ def combine_workorders(ord_objects):
             # Matching the products
             if sold.product == request.product:
                 deal = sales_calculator(sold.price, request.price)
+                break
             else:
                 continue
-<<<<<<< HEAD
-
-=======
->>>>>>> ce30ade81738c31290777b6ae3fa71697e168ade
         order += 1
 
         #when deal is formed, the deal is put into a list of completed transactions. If some of the goods are not sold or remaining in the order, a new order is created
@@ -145,35 +129,19 @@ def combine_workorders(ord_objects):
             selling.extend(newsale)
 
             #when adding and removing items from lists, they are sorted again
-<<<<<<< HEAD
             buying = sorted(buying, key=lambda d: d.price)
             selling = sorted(selling, key=lambda d: d.price, reverse=True)
             order = 0
             if len(buying) == 0 or len(selling) == 0:
                 buying.extend(selling)
                 selling = []
-        if len(selling) == 0 or order >= len(selling):
-=======
-            if len(buying) == 0 and len(selling) == 0:
-                buying = sorted(buying, key=lambda d: d.price)
-                selling = sorted(selling, key=lambda d: d.price, reverse=True)
-                order = 0
-            else:
-                buying.extend(selling)
                 break
-        if order >= len(selling):
->>>>>>> ce30ade81738c31290777b6ae3fa71697e168ade
+        if len(selling) == 0 or order >= len(selling):
             buying.extend(selling)
             break
 
     return complete_orders, buying
 
-<<<<<<< HEAD
-=======
-    ## Why doesn't this return selling orders?
-
-
->>>>>>> ce30ade81738c31290777b6ae3fa71697e168ade
 
 ## If we create new orders on the fly, how do we handle identifiers?
 def match_orders(seller, buyer):
