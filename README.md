@@ -25,7 +25,9 @@ A _producer_ is a place that creates goods from either producing gathering, hunt
 ## Stage
 A worker can now be attached to a work order and deliver it to the correct place. This has been a Proof of concept and found to be working. The code is quite complex and with testing it can be eventually refactored.
 
-Running the script can now perform a calculation where it attaches workers to work assignments, etc. The work is still to be done on how to finish the delivery process. Also, extensive testing needs to be done since a lot has been developed "in rush to get an MVP done". Now that there is somewhat functioning MVP, testing can really commence.
+5/16/2022: Running the script can now perform a calculation where it attaches workers to work assignments, etc. The work is still to be done on how to finish the delivery process. Also, extensive testing needs to be done since a lot has been developed "in rush to get an MVP done". Now that there is somewhat functioning MVP, testing can really commence. 
+
+5/17/2022: The screen now shows mowing workers with their names attached. Tests are now done for the creation of items. The item-modules are used more than just as cretor modules (e.g. wordorders has now new functions taken away from main.py)
 
 ## Future plans
 - Some randomness might be introduced to production rates, etc.

@@ -3,13 +3,13 @@
 # https://github.com/suolenkainen/economy
 
 
-from tkinter import W
 import pygame
 import settlements as sett
 import utilities as utils
 import workers as wrk
 import workorders as ord
 import producers as pro
+
 
 ### Running ID's for item types
 settlement_last_id = 2
@@ -22,77 +22,14 @@ workorder_last_id = 2
 sett_objects = []
 wrk_objects = []
 ord_objects = []
-tickcount = 0
+market = {"grain": {"high": 12.0, "low": 11.5}}
+
 
 # Generate objects from configuration files
 sett_objects = sett.create_settlements_from_configures()
 wrk_objects = wrk.create_worker_from_configures()
 ord_objects = ord.create_workorders_from_configures()
 prod_objects = pro.create_producers_from_configures()
-
-
-## Combine buying and selling orders
-def combine_workorders():
-
-    selling = []
-    buying = []
-    complete_orders = []
-
-    # Divide the selling and buying into their of lists and sort them continuously
-    for order in ord_objects:
-        if order.sell == True:
-            selling.append(order)
-        else:
-            buying.append(order)
-        selling = sorted(selling, key=lambda d: d.price, reverse=True)
-        buying = sorted(buying, key=lambda d: d.price)
-
-    # Pairing sell and purchase orders so that the most expensive item is sold first to the least paying settlement and then increasing in price
-    order = 0
-    while True: 
-        sold = selling[order]
-        if sold.processed == "sold":
-            complete_orders.append(sold)
-            order += 1
-            if order >= len(selling):
-                buying.extend(selling)
-                break
-            continue
-        if buying == []:
-            deal = False
-        for request in buying:
-            deal = False
-            
-            # Matching the products
-            if sold.product == request.product:
-                deal = utils.sales_calculator(sold.price, request.price)
-            else:
-                continue
-        order += 1
-
-        #when deal is formed, the deal is put into a list of completed transactions. If some of the goods are not sold or remaining in the order, a new order is created
-        if deal:
-            complete_order, newsall, newbuy = utils.combine_workorders(sold, request)
-            ord_objects.remove(request)
-            complete_orders.append(complete_order)
-            buying.remove(request)
-            buying.extend(newbuy)
-            selling.remove(sold)
-            selling.extend(newsall)
-
-            #when adding and removing items from lists, they are sorted again
-            if len(buying) == 0 and len(selling) == 0:
-                buying = sorted(buying, key=lambda d: d.price)
-                selling = sorted(selling, key=lambda d: d.price, reverse=True)
-                order = 0
-            else:
-                buying.extend(selling)
-                break
-        if order >= len(selling):
-            buying.extend(selling)
-            break
-
-    return complete_orders, buying
 
 
 
@@ -106,17 +43,16 @@ def transactions_distance(transactions):
         ord_settlement1 = order.owner
         for stlm1 in sett_objects:
             if stlm1.id == ord_settlement1:
-                starting = stlm1
+                s_coordx = stlm1.coordx
+                s_coordy = stlm1.coordy
         ord_settlement2 = order.destination
         for stlm2 in sett_objects:
             if stlm2.id == ord_settlement2:
-                destination = stlm2
+                d_coordx = stlm2.coordx
+                d_coordy = stlm2.coordy
 
-        # starting_t, destination_t = utils.endpoint_calculator(transactions, sett_objects)
-        # print("transactions_distance", starting_t, destination_t)
-    
         # send the settlement info to distance calculator
-        order.distance, order.angle = utils.distance_calculator(starting, destination)
+        order.distance, order.angle = utils.distance_calculator((s_coordx, s_coordy), (d_coordx, d_coordy))
     
 
 
@@ -153,26 +89,23 @@ def reserving_transaction_to_worker(transactions):
         sorted_workers = []
 
         # Find starting settlement
-        starting = utils.endpoint_calculator(order, sett_objects, "owner")
+        s_coordx, s_coordy = utils.endpoint_calculator(order, sett_objects, "owner")
 
-        # Find all workers not moving
         for worker in wrk_objects:
             if worker.speed != 0:
                 continue
 
-            # Find destination settlement
-            destination = utils.endpoint_calculator(worker, sett_objects, "settlementid")
+            # Find destination settlement send the settlement info to distance calculator
+            d_coordx, d_coordy = utils.endpoint_calculator(worker, sett_objects, "settlementid")
 
             # send the settlement info to distance calculator
-            worker.distance, worker.angle = utils.distance_calculator(starting, destination)
+            worker.distance, worker.angle = utils.distance_calculator((s_coordx, s_coordy), (d_coordx, d_coordy))
             sorted_workers.append(worker)
             
         sorted_workers = sorted(sorted_workers, key=lambda d: d.distance)
         
         # Attach the worker to the attributes in the transaction
         order.reserved = sorted_workers[0].id
-
-        # Attach the transaction to worker's list
         sorted_workers[0].workorders.append(order.id)
 
 
@@ -216,10 +149,10 @@ def worker_owning_transaction(transactions):
             continue
 
         # Find starting settlement and destination settlement
-        starting = utils.endpoint_calculator(order, sett_objects, "owner")
+        s_coordx, s_coordy = utils.endpoint_calculator(order, sett_objects, "owner")
         for worker in wrk_objects:
-            destination = utils.endpoint_calculator(worker, sett_objects, "settlementid")
-            worker.distance, worker.angle = utils.distance_calculator(starting, destination)
+            d_coordx, d_coordy = utils.endpoint_calculator(worker, sett_objects, "settlementid")
+            worker.distance, worker.angle = utils.distance_calculator((s_coordx, s_coordy), (d_coordx, d_coordy))
 
             # If a worker is in the settlement, worker owns the transaction and starts journey
             if worker.distance == 0:
@@ -255,14 +188,19 @@ def worker_journey():
 
 
 
+def worker_towards_workorder():
+    pass
+
+
+
 ## On completing the journey, charge the settlement for goods and taxes and add them to settlement's goods
 def end_transactions(finished_orders, transactions):
     
     # Check which transactions have been ended
     for o_id in finished_orders:
         for t in transactions:
-            if t.id == o_id:
-                transaction = t
+            if t.id == o_id: 
+                transaction = t 
                 break
         
         # connect transaction to the buyer's settlement
@@ -312,6 +250,8 @@ def main():
 
         screen.fill((255, 255, 255))
 
+
+        ### ALL Drawing are now for the sake of demoing. They will be done separately later.
         # Draw all settlements to screen
         for s in sett_objects:
             x = int(s.coordx)
@@ -322,11 +262,18 @@ def main():
             screen.blit(img, (x + 15, y-2))
             img = font.render("population: "+ str(s.population), True, (0,0,0))
             screen.blit(img, (x + 15, y+12))
-            # Draw an amber dor in the settlement if there's a worker in there
+            
             for w in wrk_objects:
+                
+                # Draw an amber dor in the settlement if there's a worker in there
                 if w.settlementid == s.id and w.speed == 0:
                     pygame.draw.rect(screen, (210,210,110), (w.coordx + 2, w.coordy + 2, 6, 6))
+                
+                # Draw a marker of the worker on screen
                 pygame.draw.rect(screen, (0,0,110), (w.coordx + 4, w.coordy + 4, 2, 2))
+                font = pygame.font.SysFont("Arial", 10)
+                img = font.render(w.name, True, (0,0,0))
+                screen.blit(img, (w.coordx + 10, w.coordy - 2))
 
             # Make the display and settlements larger and add text next to them representing the workorders. 
             # Mark the workorders in other color if made into transactions
@@ -338,7 +285,7 @@ def main():
         ## If there is no items not for sell at the requested price, the settlement will pay for maximum of 5% increase from the cheapest
         ## Settlement always buys from the cheapest supplier
 
-        transactions, incomplete = combine_workorders()
+        transactions, incomplete = ord.combine_workorders(ord_objects)
 
 
 
