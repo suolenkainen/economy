@@ -56,25 +56,6 @@ def transactions_distance(transactions):
     
 
 
-## Adjust the market prices based on non-successful transactions
-def adjust_settlement_markets(workorders):
-
-    # loop through workorders and combine them with settlements
-    for order in workorders:
-        ord_settlement = order.owner
-        for stlm in sett_objects:
-            if stlm.id == ord_settlement:
-
-                # Adjust the market price for that product in that settlement
-                if order.product in stlm.marketsell and order.sell == True:
-                    sellprice = stlm.marketsell[order.product]
-                    stlm.marketsell[order.product] = round(sellprice/1.05, 1)
-                if order.product in stlm.marketbuy and order.sell == False:
-                    buyprice = stlm.marketbuy[order.product]
-                    stlm.marketbuy[order.product] = round(buyprice*1.05, 1)
-
-
-
 ## Find the closest worker to a transaction (not yet move it to there)
 def reserving_transaction_to_worker(transactions):
 
@@ -170,7 +151,7 @@ def worker_owning_transaction(transactions):
             # If a worker is in the settlement, worker owns the transaction and starts journey
             if dist == 0 and worker.type != "assigned":
 
-                # Set the worker distance
+                # Set the worker and order attributes from transaction owning
                 worker.angle = order.angle
                 worker.settlement = order.destination
                 worker.distance = order.distance
@@ -207,6 +188,7 @@ def worker_journey():
                                     break
                             break
 
+                    # Set the worker attributes
                     w.distance = 0
                     w.progression = 0
                     w.speed = 0
@@ -261,7 +243,6 @@ def unattached_worker_towards_workorder(transactions):
 
 
 
-
 ## On completing the journey, charge the settlement for goods and taxes and add them to settlement's goods
 def end_transactions(finished_orders, transactions):
     
@@ -295,7 +276,6 @@ def end_transactions(finished_orders, transactions):
         ord_objects.remove(transaction)
 
     return transactions
-
 
 
 """
@@ -371,7 +351,7 @@ def main():
         ## If there isn't enough buyer for a good, the production place lowers their sell price
         ## All price modifications are calculated based on the surplus/lack of products -> Utilities
         
-        adjust_settlement_markets(incomplete)
+        sett.adjust_settlement_markets(incomplete, sett_objects)
 
 
 
@@ -381,17 +361,14 @@ def main():
 
         reserving_transaction_to_worker(transactions)
         
+
+
         ## In addition to workers making a purchase journey, they can move to a work order settlement
         ## start moving workers to destinations based on their work order.
 
         worker_owning_transaction(transactions)
-
         unattached_worker_towards_workorder(transactions)
-
         begin_transaction(transactions)
-
-
-
 
 
 
