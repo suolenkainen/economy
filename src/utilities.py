@@ -14,7 +14,7 @@ import ast
 def conf_data_to_attribute_list(line):
 
     # split the data row into text form attributes
-    data = line.strip().split(",")
+    data = line.strip().split(";")
     
     # For each attribute in the line, divide it into parameteds and add them to object as object attributes
     for i, d in enumerate(data):
@@ -28,7 +28,7 @@ def conf_data_to_attribute_list(line):
                 pass
 
         # For dicts and lists, use literal eval to transform string into appropriate data type
-        if attr[0] in ["marketsell", "marketbuy", "goods", "producers", "workers", "workorders", "requirements", "sell"]:
+        if attr[0] in ["marketsell", "marketbuy", "goods", "producers", "workers", "workorders", "requirements", "sell", "resourcegoods"]:
             attr[1] = ast.literal_eval(attr[1])
         
         data[i] = attr
@@ -56,8 +56,8 @@ def distance_calculator(a, b):
 # Update worker coordinates so that the marker can be drawn to the game screen
 def update_worker_coordinates(worker):
 
-    y = int(worker.speed * math.sin(worker.angle))
-    x = int(worker.speed * math.cos(worker.angle))
+    y = worker.speed * math.sin(worker.angle)
+    x = worker.speed * math.cos(worker.angle)
 
     worker.coordx += x
     worker.coordy += y

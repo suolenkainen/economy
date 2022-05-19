@@ -75,7 +75,6 @@ class Workorder_tests(unittest.TestCase):
         # Returns a list of of combined work orders and resulting bying orders
         ord_objects = [obj1, obj2]
         result_orders, result_unfinished = workorders.combine_workorders(ord_objects)
-
         self.assertEqual(result_orders, [])
         self.assertEqual(result_unfinished, [obj2,obj1])
 
@@ -111,11 +110,13 @@ class Workorder_tests(unittest.TestCase):
         for key, value in attr_dict1.items():
             setattr(obj_r1, key, value)
         obj_r1.destination = obj2.owner
+        obj_r1.id = obj_r1.id + 100
 
         obj_r2 = Obj()
         for key, value in attr_dict3.items():
             setattr(obj_r2, key, value)
         obj_r2.destination = obj4.owner
+        obj_r2.id = obj3.id + 100
 
         # Returns a list of of combined work orders and resulting bying orders
         ord_objects = [obj1, obj2, obj3, obj4]
@@ -161,11 +162,13 @@ class Workorder_tests(unittest.TestCase):
         for key, value in attr_dict1.items():
             setattr(obj_r1, key, value)
         obj_r1.destination = obj2.owner
+        obj_r1.id = obj_r1.id + 100
 
         obj_r2 = Obj()
         for key, value in attr_dict3.items():
             setattr(obj_r2, key, value)
         obj_r2.destination = obj4.owner
+        obj_r2.id = obj_r2.id + 100
 
         # Returns a list of of combined work orders and resulting bying orders
         ord_objects = [obj1, obj2, obj3, obj4, obj5]
@@ -217,11 +220,13 @@ class Workorder_tests(unittest.TestCase):
         for key, value in attr_dict3.items():
             setattr(obj_r2, key, value)
         obj_r2.destination = obj4.owner
+        obj_r2.id = obj_r2.id + 100
 
         obj_r3 = Obj()
         for key, value in attr_dict1.items():
             setattr(obj_r3, key, value)
         obj_r3.amount = 2
+        obj_r3.id = obj_r3.id + 100
 
         # Returns a list of of combined work orders and resulting bying orders
         ord_objects = [obj1, obj2, obj3, obj4, obj5]
@@ -279,17 +284,20 @@ class Workorder_tests(unittest.TestCase):
         for key, value in attr_dict3.items():
             setattr(obj_r2, key, value)
         obj_r2.destination = obj4.owner
+        obj_r2.id += 100
 
         obj_r3 = Obj()
         for key, value in attr_dict6.items():
             setattr(obj_r3, key, value)
         obj_r3.amount = 1
+        obj_r3.id += 100
 
         obj_r4 = Obj()
         for key, value in attr_dict1.items():
             setattr(obj_r4, key, value)
         obj_r4.amount = 2
         obj_r4.destination = obj6.owner
+        obj_r4.id += 100
 
         # Returns a list of of combined work orders and resulting bying orders
         ord_objects = [obj1, obj2, obj3, obj4, obj5, obj6]

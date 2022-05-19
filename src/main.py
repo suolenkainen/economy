@@ -56,25 +56,6 @@ def transactions_distance(transactions):
     
 
 
-## Adjust the market prices based on non-successful transactions
-def adjust_settlement_markets(workorders):
-
-    # loop through workorders and combine them with settlements
-    for order in workorders:
-        ord_settlement = order.owner
-        for stlm in sett_objects:
-            if stlm.id == ord_settlement:
-
-                # Adjust the market price for that product in that settlement
-                if order.product in stlm.marketsell and order.sell == True:
-                    sellprice = stlm.marketsell[order.product]
-                    stlm.marketsell[order.product] = round(sellprice/1.05, 1)
-                if order.product in stlm.marketbuy and order.sell == False:
-                    buyprice = stlm.marketbuy[order.product]
-                    stlm.marketbuy[order.product] = round(buyprice*1.05, 1)
-
-
-
 ## Find the closest worker to a transaction (not yet move it to there)
 def reserving_transaction_to_worker(transactions):
 
@@ -100,13 +81,26 @@ def reserving_transaction_to_worker(transactions):
 
             # send the settlement info to distance calculator
             worker.distance, worker.angle = utils.distance_calculator((s_coordx, s_coordy), (d_coordx, d_coordy))
-            sorted_workers.append(worker)
-            
+
+            # If a worker has reserved to settlement, worker cannot be attached to another settlement
+            # This is calculated by checking the the order owner against orders assigned previously
+            skip = False
+
+            for tr in transactions:
+                if tr.id in worker.workorders and tr.owner == order.owner:
+                    skip = True
+                    break
+
+            if skip == False:
+                sorted_workers.append(worker)
+        
         sorted_workers = sorted(sorted_workers, key=lambda d: d.distance)
         
         # Attach the worker to the attributes in the transaction
-        order.reserved = sorted_workers[0].id
-        sorted_workers[0].workorders.append(order.id)
+        if sorted_workers != []:
+            order.reserved = sorted_workers[0].id
+            sorted_workers[0].workorders.append(order.id)
+            sorted_workers[0].settlement = order.owner
 
 
 
@@ -143,7 +137,7 @@ def worker_owning_transaction(transactions):
 
     # loop through transactions and find the settlements and workers
     for order in transactions:
-
+        
         # Only reserve orders that already don't have a worker assigned
         if order.reserved == -1:
             continue
@@ -151,19 +145,20 @@ def worker_owning_transaction(transactions):
         # Find starting settlement and destination settlement
         s_coordx, s_coordy = utils.endpoint_calculator(order, sett_objects, "owner")
         for worker in wrk_objects:
-            d_coordx, d_coordy = utils.endpoint_calculator(worker, sett_objects, "settlementid")
-            worker.distance, worker.angle = utils.distance_calculator((s_coordx, s_coordy), (d_coordx, d_coordy))
-
+            d_coordx, d_coordy = worker.coordx, worker.coordy
+            dist, angle = utils.distance_calculator((int(s_coordx), int(s_coordy)), (int(d_coordx), int(d_coordy)))
+            
             # If a worker is in the settlement, worker owns the transaction and starts journey
-            if worker.distance == 0:
+            if dist == 0 and worker.type != "assigned":
 
-                # Set the worker distance
+                # Set the worker and order attributes from transaction owning
                 worker.angle = order.angle
                 worker.settlement = order.destination
                 worker.distance = order.distance
                 worker.speed = worker.maxspeed
                 order.worker = worker.id
                 order.reserved = -1
+                worker.type = "assigned"
                 break
 
 
@@ -175,21 +170,76 @@ def worker_journey():
     finished_orders = []
     for w in wrk_objects:
         if w.speed != 0 and w.distance != 0:
+                
+                ## Moving the worker
                 w.progression += w.speed
                 utils.update_worker_coordinates(w)
-                if w.progression >= w.distance:
-                    finished_orders.extend(w.workorders)
+
+                ## When worker arriver to destination, finish the order and stop the worker
+                if w.progression >= w.distance and w.type == "assigned":
+                    
+                    # Setting the worker coordinates to match the settlement
+                    for o in ord_objects:
+                        if o.id in w.workorders:
+                            for s in sett_objects:
+                                if s.id == o.destination:
+                                    w.coordx = s.coordx
+                                    w.coordy = s.coordy
+                                    break
+                            break
+
+                    # Set the worker attributes
                     w.distance = 0
                     w.progression = 0
                     w.speed = 0
+                    w.angle = 0
+                    finished_orders.extend(w.workorders)
                     print("DONE")
 
     return finished_orders
 
 
 
-def worker_towards_workorder():
-    pass
+def unattached_worker_towards_workorder(transactions):
+
+    ## Checking for workorders which have reserved but worker isn't at the place
+    for order in transactions:
+        for worker in wrk_objects:
+            if order.reserved == worker.id:
+                print(worker.name)
+                if worker.speed != 0 and worker.distance != 0:
+                        
+                        ## When worker arriver to destination, finish the order and stop the worker
+                        if worker.progression >= worker.distance:
+                            
+                            # Setting the worker coordinates to match the settlement
+                            for o in ord_objects:
+                                if o.id in worker.workorders:
+                                    for s in sett_objects:
+                                        if s.id == o.owner:
+                                            worker.coordx = s.coordx
+                                            worker.coordy = s.coordy
+                                            break
+                                    break
+
+                            # Set the worker distance
+                            worker.angle = order.angle
+                            worker.settlement = order.destination
+                            worker.progression = 0
+                            worker.distance = order.distance
+                            worker.speed = worker.maxspeed
+                            order.worker = worker.id
+                            order.reserved = -1
+                            worker.type = "assigned"
+                else:
+                    s_coordx, s_coordy = worker.coordx, worker.coordy
+                    d_coordx, d_coordy = utils.endpoint_calculator(order, sett_objects, "owner")
+                    distance, angle = utils.distance_calculator((s_coordx, s_coordy), (d_coordx, d_coordy))
+                    distance, angle = utils.distance_calculator((200, 170), (440, 190))
+                    worker.speed = worker.maxspeed
+                    worker.distance = distance
+                    worker.angle = angle
+                    worker.type = "travel"
 
 
 
@@ -226,7 +276,6 @@ def end_transactions(finished_orders, transactions):
         ord_objects.remove(transaction)
 
     return transactions
-
 
 
 """
@@ -302,25 +351,24 @@ def main():
         ## If there isn't enough buyer for a good, the production place lowers their sell price
         ## All price modifications are calculated based on the surplus/lack of products -> Utilities
         
-        adjust_settlement_markets(incomplete)
+        sett.adjust_settlement_markets(incomplete, sett_objects)
 
 
 
         ## If not the current settlement, travel to nearest settlement. If a workorder is larger than capacity of the worker, the workorder can be split into smaller pieces
         ## A workorder can be reserved for that worker
-        ## Same worker can do two workorders from same starting place to same destination if there is capacity and enough workorders
+        ## Same worker can do two workorders from same starting place to same destination if there is capacity and enough workorders (TODO)
 
         reserving_transaction_to_worker(transactions)
-        worker_owning_transaction(transactions)
-        begin_transaction(transactions)
-
+        
 
 
         ## In addition to workers making a purchase journey, they can move to a work order settlement
         ## start moving workers to destinations based on their work order.
 
-        # def worker_towards_ workorder():
-        #   pass
+        worker_owning_transaction(transactions)
+        unattached_worker_towards_workorder(transactions)
+        begin_transaction(transactions)
 
 
 

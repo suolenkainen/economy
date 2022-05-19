@@ -79,6 +79,25 @@ def create_settlements_from_configures():
 
 
 
+## Adjust the market prices based on non-successful transactions
+def adjust_settlement_markets(workorders, sett_objects):
+
+    # loop through workorders and combine them with settlements
+    for order in workorders:
+        ord_settlement = order.owner
+        for stlm in sett_objects:
+            if stlm.id == ord_settlement:
+
+                # Adjust the market price for that product in that settlement
+                if order.product in stlm.marketsell and order.sell == True:
+                    sellprice = stlm.marketsell[order.product]
+                    stlm.marketsell[order.product] = round(sellprice/1.005, 1)
+                if order.product in stlm.marketbuy and order.sell == False:
+                    buyprice = stlm.marketbuy[order.product]
+                    stlm.marketbuy[order.product] = round(buyprice*1.005, 1)
+
+
+
 if __name__ == '__main__':
         
     settl_objects = create_settlements_from_configures()

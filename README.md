@@ -14,7 +14,7 @@ A _settlement_ is basically any settlement that has people living in it. This ca
 - Hamlet with 20 inhabitants (produces _bread from grain_ which is then divided to citizens so that all inhabitants are fed and the rest is sold.)
 - ...
 
-A _worker_ is a person doing something with a resource. This (at least in the beginning of the project) can be a "hauler" that moves stuff between places, a baker, a farmer, etc. Each of these workers perform tasks in production facilities and produce goods. These goods can be consumed by villagers of used for producing something else. _Technically_ a worker is the payer and the receiver of the money from transactions between settlements, but there is no actual cash reserve on the workers
+A _worker_ is a person delivering goods. This "hauler" moves stuff between places, etc. These goods can be consumed by villagers of used for producing something else. _Technically_ a worker is the payer and the receiver of the money from transactions between settlements, but there is no actual cash reserve on the workers. 
 
 _Goods_ are resources or items that are manipulated, moved, transformed, etc. and made into new ones or consumed. Goods are stored in the settlement's warehouses or similar and are distributed from there to producers etc.
 
@@ -28,6 +28,8 @@ A worker can now be attached to a work order and deliver it to the correct place
 5/16/2022: Running the script can now perform a calculation where it attaches workers to work assignments, etc. The work is still to be done on how to finish the delivery process. Also, extensive testing needs to be done since a lot has been developed "in rush to get an MVP done". Now that there is somewhat functioning MVP, testing can really commence. 
 
 5/17/2022: The screen now shows mowing workers with their names attached. Tests are now done for the creation of items. The item-modules are used more than just as cretor modules (e.g. wordorders has now new functions taken away from main.py)
+
+5/18: The workers move towared their reserved transactions and start performing them.
 
 ## Future plans
 - Some randomness might be introduced to production rates, etc.

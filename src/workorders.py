@@ -81,11 +81,19 @@ def create_workorders_from_configures():
 ## Combine buying and selling orders
 def combine_workorders(ord_objects):
 
+    ## Combining has divided into part-functions
+    selling, buying = sort_buy_sell(ord_objects)
+    complete_orders, buying = finish_transactions(selling, buying, ord_objects)
+
+    return complete_orders, buying
+
+
+
+def sort_buy_sell(ord_objects):
     selling = []
     buying = []
-    complete_orders = []
 
-    # Divide the selling and buying into their of lists and sort them continuously
+    # Divide the selling and buying into their of lists and return them sorten by having the most expensive selling to cheapest buying
     for order in ord_objects:
         if order.sell == True:
             selling.append(order)
@@ -94,7 +102,13 @@ def combine_workorders(ord_objects):
     selling = sorted(selling, key=lambda d: d.price, reverse=True)
     buying = sorted(buying, key=lambda d: d.price)
 
+    return selling, buying
+
+
+
+def finish_transactions(selling, buying, ord_objects):
     # Pairing sell and purchase orders so that the most expensive item is sold first to the least paying settlement and then increasing in price
+    complete_orders = []
     order = 0
     while len(selling) > 0: 
         sold = selling[order]
@@ -148,6 +162,7 @@ def match_orders(seller, buyer):
     # If workorders match each other, the seller order is updated and buy-order is removed
     if seller.amount == buyer.amount:
         seller.destination = buyer.owner
+        seller.id += 100
         return seller, [], []
 
     # If seller has more than buyer is willing to buy, a new order will be created for the surplus
@@ -157,6 +172,7 @@ def match_orders(seller, buyer):
         seller.amount = buyer.amount
         new_order.amount -= buyer.amount
         new_order.destination = -1
+        new_order.id += 100
         return seller, [new_order], []
 
     # If buyer wants to buy more than seller has to sell, a new order will be created for the lacking amount
@@ -165,6 +181,7 @@ def match_orders(seller, buyer):
         seller.destination = buyer.owner
         new_order.amount -= seller.amount
         new_order.destination = -1
+        new_order.id += 100
         return seller, [], [new_order]
 
 
