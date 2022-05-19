@@ -173,6 +173,7 @@ def match_orders(seller, buyer):
         new_order.amount -= buyer.amount
         new_order.destination = -1
         new_order.id += 100
+        seller.id += 100
         return seller, [new_order], []
 
     # If buyer wants to buy more than seller has to sell, a new order will be created for the lacking amount
@@ -182,6 +183,7 @@ def match_orders(seller, buyer):
         new_order.amount -= seller.amount
         new_order.destination = -1
         new_order.id += 100
+        seller.id += 100
         return seller, [], [new_order]
 
 
