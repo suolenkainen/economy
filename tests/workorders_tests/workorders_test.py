@@ -253,5 +253,57 @@ class Workorder_tests(unittest.TestCase):
         self.assertEqual(buying[1].__dict__, obj4.__dict__)
 
 
+    def test_transactions_distance(self):
+        
+        # Create a test object for comparison
+        # Test data is kept to minimum requirements
+        attr_dict1 = {'id': 0, 'owner': 1, 'sell': True, 'destination': 0, 'price': 5, "processed": "free", "distance": -1, "angle":-1}
+        attr_dict2 = {'id': 1, "owner": 0, 'sell': True, "destination": 2, 'price': 6, "processed": "free", "distance": -1, "angle":-1}
+        attr_dict3 = {'id': 0, 'coordx': 400, 'coordy': 400}
+        attr_dict4 = {'id': 1, 'coordx': 200, 'coordy': 400}
+        attr_dict5 = {'id': 2, 'coordx': 200, 'coordy': 100}
+
+        class Obj(object): pass
+        order1 = Obj()
+        for key, value in attr_dict1.items():
+            setattr(order1, key, value)
+
+        order2 = Obj()
+        for key, value in attr_dict2.items():
+            setattr(order2, key, value)
+
+        sett1 = Obj()
+        for key, value in attr_dict3.items():
+            setattr(sett1, key, value)
+
+        sett2 = Obj()
+        for key, value in attr_dict4.items():
+            setattr(sett2, key, value)
+
+        sett3 = Obj()
+        for key, value in attr_dict5.items():
+            setattr(sett3, key, value)
+
+        transactions = [order1, order2]
+        sett_objects = [sett1, sett2, sett3]
+
+        # Test that transactions receive distance and angle to the end point
+        workorders.transactions_distance(transactions, sett_objects)
+        transactions[0].angle = round(transactions[0].angle, 5)
+        transactions[1].angle = round(transactions[1].angle, 5)
+
+        # Set asserting values to order dictionaries
+        attr_dict1["angle"] = 0.0
+        attr_dict1["distance"] = 200
+        attr_dict2["angle"] = -2.1588
+        attr_dict2["distance"] = 361
+
+        self.assertEqual(transactions[0].__dict__, attr_dict1)
+        self.assertEqual(transactions[1].__dict__, attr_dict2)
+
+
+
+
+
 if __name__ == '__main__':
     unittest.main()

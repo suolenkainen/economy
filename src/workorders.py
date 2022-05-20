@@ -6,7 +6,7 @@
 ## TODO: Description
 
 import os, copy
-from src.utilities import conf_data_to_attribute_list
+from src.utilities import conf_data_to_attribute_list, distance_calculator
 
 """ 
 Required attributes
@@ -195,7 +195,6 @@ def match_orders(seller, buyer, index):
         return seller, [], [new_order], buyer
 
 
-
 # This function checks if a transaction forms a deal
 def sales_calculator(asked, payed):
 
@@ -212,6 +211,29 @@ def sales_calculator(asked, payed):
 
     return False
 
+
+
+## Add distance to transactions
+def transactions_distance(transactions, sett_objects):
+
+    # loop through workorders and find the settlements 
+    for order in transactions:
+        if order.destination == -1:
+            continue
+        ord_settlement1 = order.owner
+        for stlm1 in sett_objects:
+            if stlm1.id == ord_settlement1:
+                s_coordx = stlm1.coordx
+                s_coordy = stlm1.coordy
+        ord_settlement2 = order.destination
+        for stlm2 in sett_objects:
+            if stlm2.id == ord_settlement2:
+                d_coordx = stlm2.coordx
+                d_coordy = stlm2.coordy
+
+        # send the settlement info to distance calculator
+        order.distance, order.angle = distance_calculator((s_coordx, s_coordy), (d_coordx, d_coordy))
+    
 
 
 if __name__ == '__main__':

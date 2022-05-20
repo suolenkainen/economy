@@ -5,7 +5,6 @@
 
 import pygame
 import settlements as sett
-from src.workers import worker_object
 import utilities as utils
 import workers as wrk
 import workorders as ord
@@ -27,28 +26,6 @@ wrk_index = len(wrk_objects)
 ord_index = len(ord_objects)
 prod_index = len(prod_objects)
 
-
-## Add distance to transactions
-def transactions_distance(transactions):
-
-    # loop through workorders and find the settlements 
-    for order in transactions:
-        if order.destination == -1:
-            continue
-        ord_settlement1 = order.owner
-        for stlm1 in sett_objects:
-            if stlm1.id == ord_settlement1:
-                s_coordx = stlm1.coordx
-                s_coordy = stlm1.coordy
-        ord_settlement2 = order.destination
-        for stlm2 in sett_objects:
-            if stlm2.id == ord_settlement2:
-                d_coordx = stlm2.coordx
-                d_coordy = stlm2.coordy
-
-        # send the settlement info to distance calculator
-        order.distance, order.angle = utils.distance_calculator((s_coordx, s_coordy), (d_coordx, d_coordy))
-    
 
 
 ## Find the closest worker to a transaction (not yet move it to there)
@@ -118,7 +95,6 @@ def begin_transaction(transactions):
                 except:
                     seller.goods[order.product] = 0
                 seller.goods[order.product] -= order.amount
-
                 order.processed = "sold"
 
 
@@ -333,7 +309,7 @@ def main():
         ## If there is a requirement in some settlement for some resource and there is room in storage, check if there is workorder in near by settlement
         ## Order workers based on the closest settlement.
 
-        transactions_distance(transactions)
+        ord.transactions_distance(transactions, sett_objects)
 
 
 
@@ -376,11 +352,10 @@ def main():
 
         
 
-
         ## Resource goods are depleted from settlements by producers
         ## If a settlement has goods that are used by producers they are moved to that producers storage.
         ## If there is no room in production storage, no work orders are made for that good
-
+        
         
 
         ## A settlement has needs based on the population. -> Utilities
