@@ -77,6 +77,34 @@ def create_producers_from_configures():
     return producers
 
 
+def attach_resource_to_production(settlement_object, producer_object):
+    
+    ## Pair producer and settlement
+    for producer in producer_object:
+        for settlement in settlement_object:
+            if producer.settlementid == settlement.id:
+
+                ## Check the current state of resources 
+                ## and if there can be a request for more
+                currentres = 0
+                if producer.storedresources == {}:
+                    return 3
+                for key in producer.storedresources:
+                    currentres += producer.storedresources[key]
+                print(currentres)
+                maxres = producer.maxresources
+                if maxres < currentres:
+                    return 4, currentres
+
+                ## Calculate the request for more resources
+                # for key in producer.storedresources:
+                #     currentres += producer.storedresources[key]
+
+                return 1, currentres
+
+    return "2"
+
+
 
 if __name__ == '__main__':
     

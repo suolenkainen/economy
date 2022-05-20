@@ -28,7 +28,8 @@ def conf_data_to_attribute_list(line):
                 pass
 
         # For dicts and lists, use literal eval to transform string into appropriate data type
-        if attr[0] in ["marketsell", "marketbuy", "goods", "producers", "workers", "workorders", "requirements", "sell", "resourcegoods"]:
+        if attr[0] in ["marketsell", "marketbuy", "goods", "producers", "workers", \
+                    "workorders", "requirements", "sell", "resourcegoods", "storedresources"]:
             attr[1] = ast.literal_eval(attr[1])
         
         data[i] = attr
