@@ -107,11 +107,10 @@ class Workorder_tests(unittest.TestCase):
 
         # Create a test object for comparison
         # Test data is kept to minimum requirements
-        attr_dict1 = {'id': 0, 'sell': False, 'owner': 2, 'destination': -1, 'amount': 5}
-        attr_dict2 = {'id': 1, 'sell': True, "owner": 1, "destination": -1, "amount": 5}
-        attr_dict3 = {'id': 100, 'sell': False, 'owner': 2, 'destination': 1, 'amount': 5}
-        attr_dict4 = {'id': 100, 'sell': False, 'owner': 2, 'destination': -1, 'amount': 1}
-        attr_dict5 = {'id': 101, 'sell': True, 'owner': 1, 'destination': -1, 'amount': 1}
+        attr_dict1 = {'id': 0, 'sell': True, 'owner': 2, 'destination': -1, 'amount': 5, "processed": "free"}
+        attr_dict2 = {'id': 1, 'sell': False, "owner": 1, "destination": -1, "amount": 5, "processed": "free"}
+        attr_dict3 = {'id': 0, 'sell': True, 'owner': 2, 'destination': 1, 'amount': 5, "processed": "combined"}
+        attr_dict4 = {'id': 1, 'sell': False, "owner": 1, "destination": -1, "amount": 5, "processed": "finished"}
         
         class Obj(object): pass
         seller = Obj()
@@ -126,19 +125,16 @@ class Workorder_tests(unittest.TestCase):
         for key, value in attr_dict3.items():
             setattr(complete_seller, key, value)
 
-        new_seller = Obj()
+        obj_r = Obj()
         for key, value in attr_dict4.items():
-            setattr(new_seller, key, value)
-
-        new_order = Obj()
-        for key, value in attr_dict5.items():
-            setattr(new_order, key, value)
+            setattr(obj_r, key, value)
 
         # If workorders match each other, the seller order is updated and buy-order is removed
-        complete_order, newsale, newbuy = workorders.match_orders(seller, buyer)
+        complete_order, newsale, newbuy, old_buyer = workorders.match_orders(seller, buyer, 2)
         self.assertEqual(complete_order.__dict__, complete_seller.__dict__)
         self.assertEqual(newsale, [])
         self.assertEqual(newbuy, [])
+        self.assertEqual(old_buyer.__dict__, obj_r.__dict__)
 
 
     # This tests match orders
@@ -146,10 +142,11 @@ class Workorder_tests(unittest.TestCase):
 
         # Create a test object for comparison
         # Test data is kept to minimum requirements
-        attr_dict1 = {'id': 0, 'sell': False, 'owner': 2, 'destination': -1, 'amount': 6}
-        attr_dict2 = {'id': 1, 'sell': True, "owner": 1, "destination": -1, "amount": 5}
-        attr_dict3 = {'id': 100, 'sell': False, 'owner': 2, 'destination': 1, 'amount': 5}
-        attr_dict4 = {'id': 100, 'sell': False, 'owner': 2, 'destination': -1, 'amount': 1}
+        attr_dict1 = {'id': 0, 'sell': True, 'owner': 2, 'destination': -1, 'amount': 6, "processed": "free"}
+        attr_dict2 = {'id': 1, 'sell': False, "owner": 1, "destination": -1, "amount": 5, "processed": "free"}
+        attr_dict3 = {'id': 0, 'sell': True, 'owner': 2, 'destination': 1, 'amount': 5, "processed": "combined"}
+        attr_dict4 = {'id': 2, 'sell': True, 'owner': 2, 'destination': -1, 'amount': 1, "processed": "free"}
+        attr_dict5 = {'id': 1, 'sell': False, 'owner': 1, 'destination': -1, 'amount': 5, "processed": "finished"}
         
         class Obj(object): pass
         seller = Obj()
@@ -168,10 +165,15 @@ class Workorder_tests(unittest.TestCase):
         for key, value in attr_dict4.items():
             setattr(new_seller, key, value)
 
-        complete_order, newsale, newbuy = workorders.match_orders(seller, buyer)
+        obj_r = Obj()
+        for key, value in attr_dict5.items():
+            setattr(obj_r, key, value)
+
+        complete_order, newsale, newbuy, old_buyer = workorders.match_orders(seller, buyer, 2)
         self.assertEqual(complete_order.__dict__, complete_seller.__dict__)
         self.assertEqual(newsale[0].__dict__, new_seller.__dict__)
         self.assertEqual(newbuy, [])
+        self.assertEqual(old_buyer.__dict__, obj_r.__dict__)
 
 
     # This tests match orders
@@ -179,10 +181,11 @@ class Workorder_tests(unittest.TestCase):
 
         # Create a test object for comparison
         # Test data is kept to minimum requirements
-        attr_dict1 = {'id': 0, 'sell': False, 'owner': 2, 'destination': -1, 'amount': 5}
-        attr_dict2 = {'id': 1, 'sell': True, "owner": 1, "destination": -1, "amount": 6}
-        attr_dict3 = {'id': 100, 'sell': False, 'owner': 2, 'destination': 1, 'amount': 5}
-        attr_dict5 = {'id': 101, 'sell': True, 'owner': 1, 'destination': -1, 'amount': 1}
+        attr_dict1 = {'id': 0, 'sell': True, 'owner': 2, 'destination': -1, 'amount': 5, "processed": "free"}
+        attr_dict2 = {'id': 1, 'sell': False, "owner": 1, "destination": -1, "amount": 6, "processed": "free"}
+        attr_dict3 = {'id': 0, 'sell': True, 'owner': 2, 'destination': 1, 'amount': 5, "processed": "combined"}
+        attr_dict4 = {'id': 2, 'sell': False, 'owner': 1, 'destination': -1, 'amount': 1, "processed": "free"}
+        attr_dict5 = {'id': 1, 'sell': False, "owner": 1, "destination": -1, "amount": 6, "processed": "finished"}
         
         class Obj(object): pass
         seller = Obj()
@@ -198,23 +201,28 @@ class Workorder_tests(unittest.TestCase):
             setattr(complete_seller, key, value)
 
         new_order = Obj()
-        for key, value in attr_dict5.items():
+        for key, value in attr_dict4.items():
             setattr(new_order, key, value)
 
-        complete_order, newsale, newbuy = workorders.match_orders(seller, buyer)
+        obj_r = Obj()
+        for key, value in attr_dict5.items():
+            setattr(obj_r, key, value)
+
+        complete_order, newsale, newbuy, old_buyer = workorders.match_orders(seller, buyer, 2)
         self.assertEqual(complete_order.__dict__, complete_seller.__dict__)
         self.assertEqual(newsale, [])
         self.assertEqual(newbuy[0].__dict__, new_order.__dict__)
+        self.assertEqual(old_buyer.__dict__, obj_r.__dict__)
 
 
     def test_sort_buy_sell(self):
 
         # Create a test object for comparison
         # Test data is kept to minimum requirements
-        attr_dict1 = {'id': 0, 'owner': 2, 'sell': True, 'destination': -1, 'price': 5}
-        attr_dict2 = {'id': 1, "owner": 1, 'sell': True, "destination": -1, 'price': 6}
-        attr_dict3 = {'id': 2, 'owner': 2, 'sell': False, 'destination': 1, 'price': 7}
-        attr_dict4 = {'id': 3, 'owner': 2, 'sell': False, 'destination': -1, 'price': 8}
+        attr_dict1 = {'id': 0, 'owner': 2, 'sell': True, 'destination': -1, 'price': 5, "processed": "free"}
+        attr_dict2 = {'id': 1, "owner": 1, 'sell': True, "destination": -1, 'price': 6, "processed": "free"}
+        attr_dict3 = {'id': 2, 'owner': 2, 'sell': False, 'destination': 1, 'price': 7, "processed": "free"}
+        attr_dict4 = {'id': 3, 'owner': 2, 'sell': False, 'destination': -1, 'price': 8, "processed": "free"}
 
         class Obj(object): pass
         obj1 = Obj()

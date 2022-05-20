@@ -5,23 +5,14 @@
 
 import pygame
 import settlements as sett
+from src.workers import worker_object
 import utilities as utils
 import workers as wrk
 import workorders as ord
 import producers as pro
 
 
-### Running ID's for item types
-settlement_last_id = 2
-worker_last_id = 1
-producer_last_id = 1
-workorder_last_id = 2
-
-
-# A group of settlement objects
-sett_objects = []
-wrk_objects = []
-ord_objects = []
+# Global variables and constants
 market = {"grain": {"high": 12.0, "low": 11.5}}
 
 
@@ -31,6 +22,10 @@ wrk_objects = wrk.create_worker_from_configures()
 ord_objects = ord.create_workorders_from_configures()
 prod_objects = pro.create_producers_from_configures()
 
+sett_index = len(sett_objects)
+wrk_index = len(wrk_objects)
+ord_index = len(ord_objects)
+prod_index = len(prod_objects)
 
 
 ## Add distance to transactions
@@ -63,10 +58,8 @@ def reserving_transaction_to_worker(transactions):
     for order in transactions:
 
         # Only reserve orders that already don't have a worker assigned
-        if order.reserved != -1 or order.worker != -1:
+        if order.reserved != -1 or order.worker != -1 or order.processed == "finished":
             continue
-        
-        # Workers will be sorted and eventually closest will be chosen
         sorted_workers = []
 
         # Find starting settlement
@@ -78,8 +71,6 @@ def reserving_transaction_to_worker(transactions):
 
             # Find destination settlement send the settlement info to distance calculator
             d_coordx, d_coordy = utils.endpoint_calculator(worker, sett_objects, "settlementid")
-
-            # send the settlement info to distance calculator
             worker.distance, worker.angle = utils.distance_calculator((s_coordx, s_coordy), (d_coordx, d_coordy))
 
             # If a worker has reserved to settlement, worker cannot be attached to another settlement
@@ -108,7 +99,7 @@ def reserving_transaction_to_worker(transactions):
 def begin_transaction(transactions):
     for order in transactions:
 
-        if order.processed in ["sold", "paid"]:
+        if order.processed in ["sold", "paid", "finished"]:
             continue
 
         # Find correct settlement info
@@ -206,7 +197,6 @@ def unattached_worker_towards_workorder(transactions):
     for order in transactions:
         for worker in wrk_objects:
             if order.reserved == worker.id:
-                print(worker.name)
                 if worker.speed != 0 and worker.distance != 0:
                         
                         ## When worker arriver to destination, finish the order and stop the worker
@@ -272,10 +262,12 @@ def end_transactions(finished_orders, transactions):
         buyer.goods[transaction.product] += transaction.amount
 
         # Remove transaction
-        transactions.remove(transaction)
-        ord_objects.remove(transaction)
+        transaction.processed = "finished"
+        # transactions.remove(transaction)
+        # ord_objects.remove(transaction)
 
     return transactions
+
 
 
 """

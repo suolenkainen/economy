@@ -107,12 +107,13 @@ def sort_buy_sell(ord_objects):
 
 
 def finish_transactions(selling, buying, ord_objects):
+
     # Pairing sell and purchase orders so that the most expensive item is sold first to the least paying settlement and then increasing in price
     complete_orders = []
     order = 0
     while len(selling) > 0: 
         sold = selling[order]
-        if sold.processed == "sold":
+        if sold.processed in ["sold", "finished"]:
             complete_orders.append(sold)
             order += 1
             if order >= len(selling):
@@ -122,6 +123,8 @@ def finish_transactions(selling, buying, ord_objects):
         if buying == []:
             deal = False
         for request in buying:
+            if sold.processed in ["sold", "finished"]:
+                continue
             deal = False
             
             # Matching the products
@@ -134,12 +137,11 @@ def finish_transactions(selling, buying, ord_objects):
 
         #when deal is formed, the deal is put into a list of completed transactions. If some of the goods are not sold or remaining in the order, a new order is created
         if deal:
-            complete_order, newsale, newbuy = match_orders(sold, request)
-            ord_objects.remove(request)
-            complete_orders.append(complete_order)
-            buying.remove(request)
+            complete_order, newsale, newbuy, old_request = match_orders(sold, request, len(ord_objects))
+            sold = complete_order
+            # ord_objects.remove(request)
+            complete_orders.append( selling.pop( selling.index( complete_order ) ) )
             buying.extend(newbuy)
-            selling.remove(sold)
             selling.extend(newsale)
 
             #when adding and removing items from lists, they are sorted again
@@ -157,34 +159,40 @@ def finish_transactions(selling, buying, ord_objects):
     return complete_orders, buying
 
 
+
 ## If we create new orders on the fly, how do we handle identifiers?
-def match_orders(seller, buyer):
+def match_orders(seller, buyer, index):
     # If workorders match each other, the seller order is updated and buy-order is removed
     if seller.amount == buyer.amount:
         seller.destination = buyer.owner
-        seller.id += 100
-        return seller, [], []
+        seller.processed = "combined"
+        buyer.processed = "finished"
+        return seller, [], [], buyer
 
     # If seller has more than buyer is willing to buy, a new order will be created for the surplus
     if seller.amount > buyer.amount:
         new_order = copy.deepcopy(seller)
         seller.destination = buyer.owner
         seller.amount = buyer.amount
+        seller.processed = "combined"
+        buyer.processed = "finished"
         new_order.amount -= buyer.amount
         new_order.destination = -1
-        new_order.id += 100
-        seller.id += 100
-        return seller, [new_order], []
+        new_order.id = index
+        new_order.processed = "free"
+        return seller, [new_order], [], buyer
 
     # If buyer wants to buy more than seller has to sell, a new order will be created for the lacking amount
     if seller.amount < buyer.amount:
         new_order = copy.deepcopy(buyer)
         seller.destination = buyer.owner
+        seller.processed = "combined"
+        buyer.processed = "finished"
         new_order.amount -= seller.amount
         new_order.destination = -1
-        new_order.id += 100
-        seller.id += 100
-        return seller, [], [new_order]
+        new_order.id = index
+        new_order.processed = "free"
+        return seller, [], [new_order], buyer
 
 
 
