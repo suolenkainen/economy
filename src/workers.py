@@ -21,7 +21,8 @@ Required attributes to be clarified.
 """
 
 # worker file properties
-path = os.path.join(os.path.dirname(__file__), "resources")
+path = os.path.join(os.path.dirname(__file__), "..\\resources")
+path = os.path.normpath(path)
 
 
 

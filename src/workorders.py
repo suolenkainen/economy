@@ -22,7 +22,8 @@ Required attributes
 
 
 # workorder file properties
-path = os.path.join(os.path.dirname(__file__), "resources")
+path = os.path.join(os.path.dirname(__file__), "..\\resources")
+path = os.path.normpath(path)
 
 
 
