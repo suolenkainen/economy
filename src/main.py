@@ -358,7 +358,7 @@ def main():
         ## Resource goods are depleted from settlements by producers
         ## If a settlement has goods that are used by producers they are moved to that producers storage.
         ## If there is no room in production storage, no work orders are made for that good
-        pro.attach_resource_to_production(sett_objects, prod_objects)
+        prod_requirements = pro.request_production_resources(sett_objects, prod_objects)
         
 
         ## A settlement has needs based on the population. -> Utilities

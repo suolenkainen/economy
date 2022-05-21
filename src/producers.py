@@ -78,7 +78,8 @@ def create_producers_from_configures():
     return producers
 
 
-def attach_resource_to_production(settlement_object, producer_object):
+def request_production_resources(settlement_object, producer_object):
+    prod_requirements = []
     
     ## Pair producer and settlement
     for producer in producer_object:
@@ -88,22 +89,45 @@ def attach_resource_to_production(settlement_object, producer_object):
                 ## Check the current state of resources 
                 ## and if there can be a request for more
                 currentres = 0
+
+                ## If there are no resources stored, create new instances
+                ## for values
                 if producer.storedresources == {}:
-                    return 3
-                for key in producer.storedresources:
-                    currentres += producer.storedresources[key]
-                print(currentres)
+                    producer.storedresources = producer.requirements
+                    for key in producer.requirements:
+                        producer.storedresources[key] = 0
+                    return producer.storedresources
                 maxres = producer.maxresources
-                if maxres < currentres:
-                    return 4, currentres
 
-                ## Calculate the request for more resources
-                # for key in producer.storedresources:
-                #     currentres += producer.storedresources[key]
+                ## Calculate which resources need to be requested
+                total_requirement = {}
+                
+                if producer.requirements == {}:
+                    continue
 
-                return 1, currentres
+                for key in producer.requirements:
+                    total_requirement[key] = 0
+                
+                topvalue = 0
+                loop = True
 
-    return "2"
+                ## Calculate necessary resources to be required in total
+                while loop == True:
+                    for key in producer.requirements:
+                        if maxres - topvalue < currentres:
+                            for key in producer.storedresources:
+                                total_requirement[key] -= producer.storedresources[key]
+
+                            # Add producer id, settlement id, and required resources to list
+                            prod_requirements.append((producer.id, settlement.id, total_requirement))
+                            loop = False
+                            break
+                        total_requirement[key] += producer.requirements[key]
+                        if producer.requirements[key] > topvalue:
+                            topvalue = producer.requirements[key]
+                        currentres += producer.requirements[key]
+
+    return prod_requirements
 
 
 

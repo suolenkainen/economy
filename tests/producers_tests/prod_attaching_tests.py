@@ -21,80 +21,69 @@ from unittest.mock import patch
 from src import producers
 
 
-class attach_resource_to_production_tests(unittest.TestCase):
+class request_production_resources(unittest.TestCase):
 
 
-    # testing producer creation with multiple lines
+    ## Testing how much resources is required from settlement
     def test_attach_resource_1(self):
-        print("test_attach_resource_1")
         
         class Obj: pass
 
         prod_obj = Obj()
-        prod_obj.__dict__ = {'id': 0, 'name': 'Bridge Crossings Bakery', 'product': 'bread', 'requirements': {'peas': 1, 'grain': 2}, 'settlementid': 0, 'storedresources': {"grain": 3, 'peas': 10}, 'storedproduct': {'butter': 10}, 'cyclesprunit': 5, 'goodsgroup': 5, 'maxresources': 20, 'maxgoods': 10}
+        prod_obj.__dict__ = {'id': 0, 'name': 'Bridge Crossings Bakery', 'product': 'bread', 'requirements': {'peas': 1, 'grain': 2}, 'settlementid': 0, 'storedresources': {'peas': 4, "grain": 3}, 'storedproduct': {'butter': 10}, 'cyclesprunit': 5, 'goodsgroup': 5, 'maxresources': 20, 'maxgoods': 10}
 
         sett_obj = Obj()
-        sett_obj.__dict__ = {'id': 0, 'name': 'Bridge Crossings', 'coordx': 320, 'coordy': 100, 'population': 30, 'goods': {'bread': 20}, 'resourcegoods': {'peas': 10}, 'basewealth': 100.0, 'liquidwealth': 100.0, 'marketsell': {'bread': 25.0}, 'marketbuy': {'grain': 11.7, 'peas': 11.7}}
+        sett_obj.__dict__ = {'id': 0, 'goods': {'bread': 20}, 'resourcegoods': {'peas': 10}}
 
         # Attach resources to production places
-        result = producers.attach_resource_to_production([sett_obj], [prod_obj])
-        print(result)
-        print()
+        result = producers.request_production_resources([sett_obj], [prod_obj])
+
+        self.assertEqual(result, [(0, 0, {'peas': 3, 'grain': 9})])
 
 
-    # testing producer creation with multiple lines
+    ## Testing how much resources is required from settlement
+    ## when there's two production facilities in one settlement
     def test_attach_resource_2(self):
-        print("test_attach_resource_2")
         
         class Obj: pass
 
-        prod_obj = Obj()
-        prod_obj.__dict__ = {'id': 0, 'name': 'Bridge Crossings Bakery', 'product': 'bread', 'requirements': {}, 'settlementid': 0, 'storedresources': {"grain": 3}, 'storedproduct': {"grain": 3}, 'cyclesprunit': 5, 'goodsgroup': 5, 'maxresources': 20, 'maxgoods': 10}
+        prod_obj1 = Obj()
+        prod_obj1.__dict__ = {'id': 0, 'name': 'Bridge Crossings Bakery', 'product': 'bread', 'requirements': {}, 'settlementid': 0, 'storedresources': {"grain": 3}, 'storedproduct': {"grain": 3}, 'cyclesprunit': 5, 'goodsgroup': 5, 'maxresources': 20, 'maxgoods': 10}
+        
+        prod_obj2 = Obj()
+        prod_obj2.__dict__ = {'id': 1, 'name': 'Road Crossings Smeltery', 'product': 'iron ingots', 'requirements': {"iron ore": 5, "coal": 10}, 'settlementid': 0, 'storedresources': {"coal": 10}, 'storedproduct': {}, 'cyclesprunit': 20, 'goodsgroup': 1, 'maxresources': 120, 'maxgoods': 10}
 
         sett_obj = Obj()
-        sett_obj.__dict__ = {'id': 2, 'name': 'Bridge Crossings', 'coordx': 320, 'coordy': 100, 'population': 30, 'goods': {'bread': 20}, 'resourcegoods': {'grain': 10}, 'basewealth': 100.0, 'liquidwealth': 100.0, 'marketsell': {'bread': 25.0}, 'marketbuy': {'grain': 11.7, 'peas': 11.7}}
+        sett_obj.__dict__ = {'id': 0, 'population': 30, 'goods': {'bread': 20}, 'resourcegoods': {'grain': 10}}
 
-        # Attach resources to production places
-        result = producers.attach_resource_to_production([sett_obj], [prod_obj])
-        print(result)
-        print()
+        # Test that 
+        result = producers.request_production_resources([sett_obj], [prod_obj1, prod_obj2])
+
+        self.assertEqual(result, [(1, 0, {'iron ore': 40, 'coal': 70})])
 
 
-    # testing producer attachment to settlement where production site create something from nothing
+    ## Testing how much resources is required from settlement
+    ## When settlement
     def test_attach_resource_3(self):
-        print("test_attach_resource_3")
         
         class Obj: pass
 
-        prod_obj = Obj()
-        prod_obj.__dict__ = {'id': 0, 'name': 'Bridge Crossings Bakery', 'product': 'bread', 'requirements': {}, 'settlementid': 1, 'storedresources': {}, 'storedproduct': {"grain": 3}, 'cyclesprunit': 5, 'goodsgroup': 5, 'maxresources': 20, 'maxgoods': 10}
+        prod_obj1 = Obj()
+        prod_obj1.__dict__ = {'id': 0, 'name': 'Bridge Crossings Bakery', 'product': 'bread', 'requirements': {"peas": 5}, 'settlementid': 0, 'storedresources': {"peas": 5}, 'storedproduct': {"grain": 3}, 'cyclesprunit': 5, 'goodsgroup': 5, 'maxresources': 40, 'maxgoods': 10}
+        
+        prod_obj2 = Obj()
+        prod_obj2.__dict__ = {'id': 1, 'name': ' Smeltery', 'product': 'iron ingots', 'requirements': {"iron ore": 5, "coal": 10}, 'settlementid': 1, 'storedresources': {"coal": 10}, 'storedproduct': {}, 'cyclesprunit': 20, 'goodsgroup': 1, 'maxresources': 120, 'maxgoods': 10}
 
-        sett_obj = Obj()
-        sett_obj.__dict__ = {'id': 1, 'name': 'Bridge Crossings', 'coordx': 320, 'coordy': 100, 'population': 30, 'goods': {'bread': 20}, 'resourcegoods': {'grain': 10}, 'basewealth': 100.0, 'liquidwealth': 100.0, 'marketsell': {'bread': 25.0}, 'marketbuy': {'grain': 11.7, 'peas': 11.7}}
+        sett_obj1 = Obj()
+        sett_obj1.__dict__ = {'id': 0, 'population': 30, 'goods': {'bread': 20}, 'resourcegoods': {'grain': 10}}
+        
+        sett_obj2 = Obj()
+        sett_obj2.__dict__ = {'id': 1, 'population': 30, 'goods': {'bread': 20}, 'resourcegoods': {'grain': 10}}
 
-        # Attach resources to production places
-        result = producers.attach_resource_to_production([sett_obj], [prod_obj])
-        print(result)
-        print()
+        # Test that 
+        result = producers.request_production_resources([sett_obj1, sett_obj2], [prod_obj1, prod_obj2])
 
-
-    # testing producer creation with multiple lines
-    def test_attach_resource_4(self):
-        print("test_attach_resource_4")
-        class Obj: pass
-
-        prod_obj = Obj()
-        prod_obj.__dict__ = {'id': 0, 'name': 'Bridge Crossings Bakery', 'product': 'bread', 'requirements': {'peas': 1, 'grain': 2}, 'settlementid': 0, 'storedresources': {"grain": 11, 'peas': 10}, 'storedproduct': {'butter': 10}, 'cyclesprunit': 5, 'goodsgroup': 5, 'maxresources': 20, 'maxgoods': 10}
-
-        sett_obj = Obj()
-        sett_obj.__dict__ = {'id': 0, 'name': 'Bridge Crossings', 'coordx': 320, 'coordy': 100, 'population': 30, 'goods': {'bread': 20}, 'resourcegoods': {'peas': 10}, 'basewealth': 100.0, 'liquidwealth': 100.0, 'marketsell': {'bread': 25.0}, 'marketbuy': {'grain': 11.7, 'peas': 11.7}}
-
-
-        # Attach resources to production places
-        result = producers.attach_resource_to_production([sett_obj], [prod_obj])
-        print(result)
-        print()
-
+        self.assertEqual(result, [(0, 0, {'peas': 35}), (1, 1, {'iron ore': 40, 'coal': 70})])
 
 
 if __name__ == '__main__':
