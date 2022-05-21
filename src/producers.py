@@ -80,7 +80,7 @@ def create_producers_from_configures():
 
 def request_production_resources(settlement_object, producer_object):
     prod_requirements = []
-    
+
     ## Pair producer and settlement
     for producer in producer_object:
         for settlement in settlement_object:
@@ -93,7 +93,6 @@ def request_production_resources(settlement_object, producer_object):
                 ## If there are no resources stored, create new instances
                 ## for values
                 if producer.storedresources == {}:
-                    producer.storedresources = producer.requirements
                     for key in producer.requirements:
                         producer.storedresources[key] = 0
                     return producer.storedresources
@@ -130,6 +129,8 @@ def request_production_resources(settlement_object, producer_object):
     return prod_requirements
 
 
+def move_resources_from_settlement(sett_objects, prod_requirements, prod_objects):
+    pass
 
 if __name__ == '__main__':
     

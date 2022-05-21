@@ -359,7 +359,7 @@ def main():
         ## If a settlement has goods that are used by producers they are moved to that producers storage.
         ## If there is no room in production storage, no work orders are made for that good
         prod_requirements = pro.request_production_resources(sett_objects, prod_objects)
-        
+        pro.move_resources_from_settlement(sett_objects, prod_requirements, prod_objects)
 
         ## A settlement has needs based on the population. -> Utilities
         ## If a need is met, settlement can grow in population by some amount per turn
