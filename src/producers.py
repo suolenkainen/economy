@@ -95,7 +95,6 @@ def request_production_resources(settlement_object, producer_object):
                 if producer.storedresources == {}:
                     for key in producer.requirements:
                         producer.storedresources[key] = 0
-                    return producer.storedresources
                 maxres = producer.maxresources
 
                 ## Calculate which resources need to be requested
@@ -129,8 +128,41 @@ def request_production_resources(settlement_object, producer_object):
     return prod_requirements
 
 
+
 def move_resources_from_settlement(sett_objects, prod_requirements, prod_objects):
-    pass
+
+    new_orders = {}
+    index = 0
+
+    ## Find settlements and production places and attach prod-place
+    for p, s, requirement in prod_requirements:
+        for producer in prod_objects:
+            if p == producer.id:
+                prod = producer
+                break
+        for settlement in sett_objects:
+            if s == settlement.id:
+                sett = settlement
+                break
+    
+        ## Move resources from settlement to production
+        for key in requirement.keys():
+            if key in requirement and key in sett.resourcegoods and prod.pending == False:
+                value = requirement[key]
+                if value > sett.resourcegoods[key]:
+                    newvalue = value - sett.resourcegoods[key]
+                    prod.storedresources[key] += sett.resourcegoods[key]
+                    sett.resourcegoods[key] = 0
+                    new_orders = {index: {key: newvalue, "sett": sett.id}}
+                    index += 1
+                    prod.pending = True
+                else:
+                    value = prod.storedresources[key]
+                    prod.storedresources[key] += sett.resourcegoods[key]
+                    sett.resourcegoods[key] -= value
+        
+        return new_orders
+
 
 if __name__ == '__main__':
     
